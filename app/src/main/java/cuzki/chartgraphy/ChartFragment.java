@@ -55,7 +55,7 @@ public class ChartFragment extends Fragment {
     TextView mTvTitle;
     int mChartType;//区分图标类型
     int mServiceType;//区分业务类型
-    AbstractChartView mChart;
+    View mChart;
     private final List<ICombineDateProvider> mData=new ArrayList<ICombineDateProvider>();
     private static final String ARG_CHART_TYPE = "ARG_CHART_TYPE";
     private static final String ARG_SERVICE_TYPE = "ARG_SERVICE_TYPE";
@@ -76,6 +76,12 @@ public class ChartFragment extends Fragment {
 
     }
 
+    /**
+     *
+     * @param chartType 图标类型
+     * @param serviceType 服务类型
+     * @return
+     */
     public static ChartFragment newInstance(int chartType, int serviceType) {
         ChartFragment fragment = new ChartFragment();
         Bundle args = new Bundle();
@@ -97,8 +103,15 @@ public class ChartFragment extends Fragment {
         mServiceType=getArguments().getInt(ARG_SERVICE_TYPE);
         Log.i("cxy","调用onCreateView chart= "+ mChartType );
         addChart(layout);
+        setService();
         mIsViewCreated=true;
         return rootView;
+    }
+
+    private void setService() {
+        switch (mServiceType) {
+
+        }
     }
 
     private void addChart(LinearLayout layout){
@@ -125,6 +138,10 @@ public class ChartFragment extends Fragment {
                 mChart=columnChartView;
                 break;
             case 3://折线柱状混合图
+                PanelRoseView panelRoseView=new PanelRoseView(getActivity());
+                layout.addView(panelRoseView);
+                mChart=panelRoseView;
+                break;
             case 4:
                 ComboLineColumnChartView comboLineColumnChartView = new ComboLineColumnChartView(getActivity());
                 comboLineColumnChartView.setValueSelectionEnabled(true);
@@ -342,8 +359,8 @@ public class ChartFragment extends Fragment {
         data.setAxisXBottom(new Axis().setValues(axvalues).setHasLines(true).setMaxLabelChars(4).setHasTiltedLabels(true));
         data.setAxisYLeft(new Axis().setHasLines(true));
         return data;
-
     }
+
 
     private PieChartData generatePieChartData(ICombineDateProvider provider) {
         if (provider == null) {
@@ -424,8 +441,10 @@ public class ChartFragment extends Fragment {
                 ColumnChartView columnChartView = (ColumnChartView) mChart;
                 columnChartView.setColumnChartData(generateColumnChartData(mData.get(0)));
                 break;
-            case 3://折线柱状混合图
-            case 4:
+            case 3:
+
+                break;
+            case 4://折线柱状混合图
                 ComboLineColumnChartView comboLineColumnChartView = (ComboLineColumnChartView) mChart;
                 comboLineColumnChartView.setComboLineColumnChartData(generateComBineData(mData.get(0),mData.get(1)));
                 break;
@@ -433,6 +452,9 @@ public class ChartFragment extends Fragment {
                 PieChartView pieChartView = (PieChartView) mChart;
                 pieChartView.setPieChartData(generatePieChartData(mData.get(0)));
                 break;
+        }
+        if(mChart instanceof AbstractChartView){
+            ((AbstractChartView)mChart).startDataAnimation();
         }
     }
     @Override
