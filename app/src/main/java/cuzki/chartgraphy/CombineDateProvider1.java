@@ -9,7 +9,7 @@ package cuzki.chartgraphy;
  * @author Cuzki
  */
 public class CombineDateProvider1 implements ICombineDateProvider {
-    float[] floats={10,2,50,20,30,60,40,25,16,50,12,5};
+    float[][]floats={{300},{360},{650},{350},{521},{221},{350},{112},{120},{572},{280},{745}};
     String[] stings={"2016.1","2016.2","2016.3","2016.4","2016.5","2016.6","2016.7","2016.8","2016.9","2016.10","2016.11","2016.12"};
     @Override
     public int getDateCount() {
@@ -17,8 +17,13 @@ public class CombineDateProvider1 implements ICombineDateProvider {
     }
 
     @Override
-    public float getY(int indexX) {
-        return floats[indexX];
+    public int getChildCount() {
+        return floats[0].length;
+    }
+
+    @Override
+    public float getY(int indexX,int indexY) {
+        return floats[indexX][indexY];
     }
 
     @Override

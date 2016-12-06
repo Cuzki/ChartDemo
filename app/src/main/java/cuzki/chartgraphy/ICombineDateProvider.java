@@ -14,7 +14,10 @@ public interface ICombineDateProvider extends Serializable {
 
     int getDateCount();
 
-    float getY(int indexX);
+    int getChildCount();
+
+    float getY(int indexX,int indexY);
 
     String getLabel(int indexX);
+
 }
