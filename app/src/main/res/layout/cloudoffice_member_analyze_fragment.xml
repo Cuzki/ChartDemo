@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="26dp"
+        android:text="@string/newest_statistic"
+        android:gravity="center"
+        android:background="#e4e4e4"
+        />
+
+    <lecho.lib.hellocharts.view.hack.HackyViewPager
+        android:id="@+id/vp_newest_statistics"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.9"
+        />
+    <cuzki.chartgraphy.NavigationView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/nv_newest_statistics"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:layout_gravity="center_horizontal"
+        >
+
+    </cuzki.chartgraphy.NavigationView>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="26dp"
+        android:text="@string/chart_show"
+        android:paddingLeft="10dp"
+        android:gravity="left|center_vertical"
+        android:background="#e4e4e4"
+        />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2.5"
+        android:id="@+id/fl_container"
+        >
+
+    </FrameLayout>
+</LinearLayout>

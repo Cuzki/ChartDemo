@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+
+            <include
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/content_one"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                layout="@layout/stastic_content_item_layout"
+
+                >
+
+            </include>
+
+        <include
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/content_two"
+            android:layout_weight="1"
+            layout="@layout/stastic_content_item_layout"
+            >
+
+        </include>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+
+        <include
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/content_three"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            layout="@layout/stastic_content_item_layout"
+            >
+
+        </include>
+
+
+        <include
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/content_four"
+            android:layout_weight="1"
+            layout="@layout/stastic_content_item_layout"
+            >
+
+        </include>
+    </LinearLayout>
+
+
+</LinearLayout>
