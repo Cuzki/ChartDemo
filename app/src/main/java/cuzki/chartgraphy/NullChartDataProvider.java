@@ -27,6 +27,11 @@ public class NullChartDataProvider implements ICombineDateProvider ,Serializable
     }
 
     @Override
+    public boolean isEmpty() {
+        return true;
+    }
+
+    @Override
     public int getChildCount() {
         return 0;
     }

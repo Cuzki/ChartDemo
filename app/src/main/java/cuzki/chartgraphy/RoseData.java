@@ -1,16 +1,12 @@
-/**
- * Created on 2016/12/2
- */
 package cuzki.chartgraphy;
 
 /**
- * <p/>
- *
- * @author Cuzki
+ * Created by Administrator on 2016/12/7 0007.
  */
-public class CombineDateProvider2  implements ICombineDateProvider {
-    float[][]floats={{30,200},{60,350},{27,650},{50,135},{90,251},{11,121},{80,352},{45,122},{64,200},{24,410},{44,180},{15,205}};
-    String[] stings={"2016.1","2016.2","2016.3","2016.4","2016.5","2016.6","2016.7","2016.8","2016.9","2016.10","2016.11","2016.12"};
+
+public class RoseData implements ICombineDateProvider {
+    float[][]floats={{30,200},{40,350},{27,650},{50,135},{20,251}};
+    String[] stings={"2016.1","2016.2","2016.3","2016.4","2016.5"};
     @Override
     public int getDateCount() {
         return floats.length;

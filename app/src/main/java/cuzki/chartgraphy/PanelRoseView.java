@@ -10,8 +10,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
+
+import java.io.Serializable;
 
 import static cuzki.chartgraphy.R.color.tab_selected_color;
 
@@ -22,24 +25,10 @@ import static cuzki.chartgraphy.R.color.tab_selected_color;
  * @author Cuzki
  */
 public class PanelRoseView extends View {
-
+    ICombineDateProvider mDataProvider;
     //演示用的百分比例,实际使用中，即为外部传入的比例参数
-    private final float arrRadias[] = new float[]{40f, 50f, 60f, 35f, 70f, 80f, 90f};
-
-    private final float arrAngel[] = new float[]{20f, 80f, 10f, 55f, 60f, 32f, 40f};
 
     private final int COLOR_GROUP[]={R.color.colorAccent,R.color.colorPrimaryDark,R.color.colorPrimary,tab_selected_color,R.color.tab_color};
-    //演示用标签
-    private final String arrPerLabel[] = new String[]{"PostgreSQL", "Sybase", "DB2", "国产及其它", "MySQL", "Ms Sql", "Oracle"};
-    //RGB颜色数组
-    private final int arrColorRgb[][] = {{77, 83, 97},
-            {148, 159, 181},
-            {253, 180, 90},
-            {52, 194, 188},
-            {39, 51, 72},
-            {255, 135, 195},
-            {215, 124, 124}};
-
     public PanelRoseView(Context context) {
         super(context);
         init();
@@ -60,9 +49,20 @@ public class PanelRoseView extends View {
     private void init() {
     }
 
+    public void setPanelRoseData(ICombineDateProvider panelRoseData){
+        mDataProvider=panelRoseData;
+        if(mDataProvider==null||mDataProvider.isEmpty()){
+            mDataProvider=new PanelRoseEmptyDataProvider();
+        }
+        invalidate();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        if(mDataProvider==null||mDataProvider.isEmpty()){
+            mDataProvider=new PanelRoseEmptyDataProvider();
+        }
         int hor = getWidth() - getPaddingLeft() - getPaddingRight();
         int vir = getHeight() - getPaddingTop() - getPaddingBottom();
         float cirX = hor / 2 + getPaddingLeft();//绘制圆心
@@ -70,13 +70,13 @@ public class PanelRoseView extends View {
 
         float radius = Math.min(hor, vir) *2/ 5;//本图最大半径,画外环用
 
-        float labelRadius= (float) (radius*1.2);
+        float labelRadius= (float) (radius*1.1);
 
-        float arcLeft = cirX - radius;
-        float arcTop = cirY - radius;
-        float arcRight = cirX + radius;
-        float arcBottom = cirY + radius;
-        RectF arcRF0 = new RectF(arcLeft, arcTop, arcRight, arcBottom);//本图绘画区域
+//        float arcLeft = cirX - radius;
+//        float arcTop = cirY - radius;
+//        float arcRight = cirX + radius;
+//        float arcBottom = cirY + radius;
+//        RectF arcRF0 = new RectF(arcLeft, arcTop, arcRight, arcBottom);//本图绘画区域
 
         //画笔初始化
         Paint paintArc = new Paint();
@@ -90,25 +90,33 @@ public class PanelRoseView extends View {
 
         float currPer = 0.0f;
 
-        float baseRaidus = radius - 20;//南丁格尔玫瑰图最大半径值
+        Resources res=getResources();
+        float baseRaidus = radius - Utils.dp2px(res,10);//南丁格尔玫瑰图最大半径值
 
         float maxRadia = 0;
-        for (float ra : arrRadias) {
+        for (int i=0; i<mDataProvider.getDateCount(); i++) {
+            float ra=mDataProvider.getY(i,0);
             if (maxRadia < ra) {
                 maxRadia = ra;
             }
         }
         float totle = 0;
-        for (float ra : arrAngel) {
-            totle += ra;
+        for (int i=0; i<mDataProvider.getDateCount(); i++) {
+            totle += mDataProvider.getY(i,1);
         }
-        Resources res=getResources();
-
-        for (int i = 0; i < arrRadias.length; i++) {
+        int emptyColor=-1;
+        if(mDataProvider.isEmpty() ){
+            emptyColor=Color.parseColor("#e4e4e4");
+        }
+        for (int i = 0; i < mDataProvider.getDateCount(); i++) {
             //将百分比转换为新扇区的半径
-            int color=res.getColor(COLOR_GROUP[i%5]);
+            if(mDataProvider.getY(i,1)==0||mDataProvider.getY(i,0)==0){
+                continue;
+            }
 
-            float thisRadius = baseRaidus * arrRadias[i] / maxRadia;
+            int color=emptyColor==-1?res.getColor(COLOR_GROUP[i%COLOR_GROUP.length]):emptyColor;
+
+            float thisRadius = baseRaidus * mDataProvider.getY(i,0) / maxRadia;
             float NewarcLeft = cirX - thisRadius;
             float NewarcTop = cirY - thisRadius;
             float NewarcRight = cirX + thisRadius;
@@ -117,10 +125,13 @@ public class PanelRoseView extends View {
 
             paintArc.setColor(color);
             //在饼图中显示所占比例
-            float percentage = 360 * arrAngel[i] / totle;
+            float percentage = 360 * mDataProvider.getY(i,1)/ totle;
             canvas.drawArc(NewarcRF, currPer, percentage, true, paintArc);
 
-
+            if(TextUtils.isEmpty(mDataProvider.getLabel(i))){
+                currPer += percentage;
+                continue;
+            }
             paintLabel.setColor(color);
             //计算百分比标签
             float lineAngel=currPer + percentage / 2;
@@ -138,15 +149,16 @@ public class PanelRoseView extends View {
             float lineStartY2= lineEndY1;
             float lineEndY2= lineEndY1;
             final boolean isRight=(lineAngel>=0&&lineAngel<=90)||(lineAngel>=270&&lineAngel<=360);
-            float lineEndX2=isRight?lineEndX1+20:lineEndX1-20;
+            float distance=Utils.dp2px(res,10);
+            float lineEndX2=isRight?lineEndX1+distance:lineEndX1-distance;
             canvas.drawLine(lineStartX2, lineStartY2, lineEndX2,lineEndY2,paintLabel);//水平线
 
             Rect textbounds = new Rect();
-            paintLabel.getTextBounds(arrPerLabel[i], 0, arrPerLabel[i].length(), textbounds);
+            paintLabel.getTextBounds(mDataProvider.getLabel(i), 0, mDataProvider.getLabel(i).length(), textbounds);
             //标识
 
-            float margin=3;
-            canvas.drawText(arrPerLabel[i], isRight?lineEndX2+margin:lineEndX2-textbounds.right-textbounds.left-margin, lineEndY2+(textbounds.bottom-textbounds.top)/3, paintLabel);
+            float margin=Utils.dp2px(res,1.5f);
+            canvas.drawText(mDataProvider.getLabel(i), isRight?lineEndX2+margin:lineEndX2-textbounds.right-textbounds.left-margin, lineEndY2+(textbounds.bottom-textbounds.top)/3, paintLabel);
             //下次的起始角度
             currPer += percentage;
         }
@@ -159,16 +171,11 @@ public class PanelRoseView extends View {
 
 
     public class XChartCalc {
-
-
         //Position位置
         private float posX = 0.0f;
         private float posY = 0.0f;
-
         public XChartCalc() {
-
         }
-
 
         //依圆心坐标，半径，扇形角度，计算出扇形终射线与圆弧交叉点的xy坐标
         public void CalcArcEndPointXY(float cirX, float cirY, float radius, float cirAngle) {
@@ -214,4 +221,31 @@ public class PanelRoseView extends View {
         }
     }
 
+    public class PanelRoseEmptyDataProvider implements ICombineDateProvider ,Serializable {
+        float[][] floats={{4,1},{5,1},{6,1},{8,1}};
+        @Override
+        public int getDateCount() {
+            return floats.length;
+        }
+
+        @Override
+        public float getY(int indexX,int indexY) {
+            return floats[indexX][indexY];
+        }
+
+        @Override
+        public String getLabel(int indexX) {
+            return "";
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+
+        @Override
+        public int getChildCount() {
+            return floats[0].length;
+        }
+    }
 }

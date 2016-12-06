@@ -33,4 +33,9 @@ public class CombineDateProvider1 implements ICombineDateProvider {
         }
         return stings[indexX];
     }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
 }

@@ -1,7 +1,6 @@
 package cuzki.chartgraphy;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -71,9 +70,9 @@ public class DonutProgress extends View {
     public DonutProgress(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        default_text_size = sp2px(getResources(), 18);
-        min_size = (int) dp2px(getResources(), 100);
-        default_stroke_width = dp2px(getResources(), 10);
+        default_text_size = Utils.sp2px(getResources(), 18);
+        min_size = (int) Utils.dp2px(getResources(), 100);
+        default_stroke_width = Utils.dp2px(getResources(), 10);
 
         final TypedArray attributes = context.getTheme().obtainStyledAttributes(attrs, R.styleable.DonutProgress, defStyleAttr, 0);
         initByAttributes(attributes);
@@ -320,15 +319,6 @@ public class DonutProgress extends View {
         super.onRestoreInstanceState(state);
     }
 
-    public static float dp2px(Resources resources, float dp) {
-        final float scale = resources.getDisplayMetrics().density;
-        return  dp * scale + 0.5f;
-    }
-
-    public static float sp2px(Resources resources, float sp){
-        final float scale = resources.getDisplayMetrics().scaledDensity;
-        return sp * scale;
-    }
 
 
 }

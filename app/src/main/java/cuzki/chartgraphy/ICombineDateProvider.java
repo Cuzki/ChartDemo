@@ -20,4 +20,5 @@ public interface ICombineDateProvider extends Serializable {
 
     String getLabel(int indexX);
 
+    boolean isEmpty();
 }

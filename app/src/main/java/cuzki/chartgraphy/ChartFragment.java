@@ -413,13 +413,12 @@ public class ChartFragment extends Fragment {
                     mData = new CombineDateProvider1();
                     break;
                 case 3://南丁格尔玫瑰图
-
+                    mData=new RoseData();
                     break;
                 case 4://折线柱状混合图
                     mData = new CombineDateProvider2();
                     break;
                 case 5:
-                    PieChartView pieChartView = (PieChartView) mChart;
                     mData = new CombineDateProvider1();
                     break;
             }
@@ -438,7 +437,8 @@ public class ChartFragment extends Fragment {
                 columnChartView.setColumnChartData(generateColumnChartData(mData));
                 break;
             case 3:
-
+                PanelRoseView panelRoseView= (PanelRoseView) mChart;
+                panelRoseView.setPanelRoseData(mData);
                 break;
             case 4://折线柱状混合图
                 ComboLineColumnChartView comboLineColumnChartView = (ComboLineColumnChartView) mChart;
