@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.io.Serializable;
@@ -26,9 +27,13 @@ import static cuzki.chartgraphy.R.color.tab_selected_color;
  */
 public class PanelRoseView extends View {
     ICombineDateProvider mDataProvider;
-    //演示用的百分比例,实际使用中，即为外部传入的比例参数
+
+    private float mCirX=-1;
+    private float mCirY=-1;
+    private float mRadius=-1;
 
     private final int COLOR_GROUP[]={R.color.colorAccent,R.color.colorPrimaryDark,R.color.colorPrimary,tab_selected_color,R.color.tab_color};
+
     public PanelRoseView(Context context) {
         super(context);
         init();
@@ -63,14 +68,16 @@ public class PanelRoseView extends View {
         if(mDataProvider==null||mDataProvider.isEmpty()){
             mDataProvider=new PanelRoseEmptyDataProvider();
         }
-        int hor = getWidth() - getPaddingLeft() - getPaddingRight();
-        int vir = getHeight() - getPaddingTop() - getPaddingBottom();
-        float cirX = hor / 2 + getPaddingLeft();//绘制圆心
-        float cirY = vir / 2 + getPaddingTop();
+        if(mCirX<0||mCirY<0||mRadius<0){
+            int hor = getWidth() - getPaddingLeft() - getPaddingRight();
+            int vir = getHeight() - getPaddingTop() - getPaddingBottom();
+            mCirX = hor / 2 + getPaddingLeft();//绘制圆心
+            mCirY = vir / 2 + getPaddingTop();
+            mRadius = Math.min(hor, vir) *2/ 5;//本图最大半径,画外环用
+        }
 
-        float radius = Math.min(hor, vir) *2/ 5;//本图最大半径,画外环用
 
-        float labelRadius= (float) (radius*1.1);
+        float labelRadius= (float) (mRadius*1.1);
 
 //        float arcLeft = cirX - radius;
 //        float arcTop = cirY - radius;
@@ -91,18 +98,20 @@ public class PanelRoseView extends View {
         float currPer = 0.0f;
 
         Resources res=getResources();
-        float baseRaidus = radius - Utils.dp2px(res,10);//南丁格尔玫瑰图最大半径值
+        float baseRaidus = mRadius - Utils.dp2px(res,10);//南丁格尔玫瑰图最大半径值
 
         float maxRadia = 0;
+        float minRadia=Float.MAX_VALUE;
+        float totle = 0;
         for (int i=0; i<mDataProvider.getDateCount(); i++) {
+            totle += mDataProvider.getY(i,1);
             float ra=mDataProvider.getY(i,0);
             if (maxRadia < ra) {
                 maxRadia = ra;
             }
-        }
-        float totle = 0;
-        for (int i=0; i<mDataProvider.getDateCount(); i++) {
-            totle += mDataProvider.getY(i,1);
+            if (minRadia > ra&&ra>0) {
+                minRadia = ra;
+            }
         }
         int emptyColor=-1;
         if(mDataProvider.isEmpty() ){
@@ -117,10 +126,10 @@ public class PanelRoseView extends View {
             int color=emptyColor==-1?res.getColor(COLOR_GROUP[i%COLOR_GROUP.length]):emptyColor;
 
             float thisRadius = baseRaidus * mDataProvider.getY(i,0) / maxRadia;
-            float NewarcLeft = cirX - thisRadius;
-            float NewarcTop = cirY - thisRadius;
-            float NewarcRight = cirX + thisRadius;
-            float NewarcBottom = cirY + thisRadius;
+            float NewarcLeft = mCirX - thisRadius;
+            float NewarcTop = mCirY - thisRadius;
+            float NewarcRight = mCirX + thisRadius;
+            float NewarcBottom = mCirY + thisRadius;
             RectF NewarcRF = new RectF(NewarcLeft, NewarcTop, NewarcRight, NewarcBottom);
 
             paintArc.setColor(color);
@@ -136,11 +145,11 @@ public class PanelRoseView extends View {
             //计算百分比标签
             float lineAngel=currPer + percentage / 2;
 
-            xcalc.CalcArcEndPointXY(cirX, cirY, thisRadius, lineAngel);
+            xcalc.CalcArcEndPointXY(mCirX, mCirY, thisRadius, lineAngel);
             float lineStartX1=xcalc.getPosX();
             float lineStartY1= xcalc.getPosY();
 
-            xcalc.CalcArcEndPointXY(cirX, cirY, labelRadius, lineAngel);
+            xcalc.CalcArcEndPointXY(mCirX, mCirY, labelRadius, lineAngel);
             float lineEndX1=xcalc.getPosX();
             float lineEndY1= xcalc.getPosY();
             canvas.drawLine(lineStartX1, lineStartY1, lineEndX1,lineEndY1,paintLabel);//斜线
@@ -162,13 +171,43 @@ public class PanelRoseView extends View {
             //下次的起始角度
             currPer += percentage;
         }
+
+//        paintLabel.setStyle(Paint.Style.STROKE);
+//        paintLabel.setColor(Color.WHITE);
+//        canvas.drawCircle(cirX, cirY, (1/3)*baseRaidus, paintLabel);
+//
+//        paintLabel.setStyle(Paint.Style.STROKE);
+//        paintLabel.setColor(Color.BLACK);
+
+        Paint paintCenter = new Paint();
+        paintCenter.setColor(Color.WHITE);
+        paintCenter.setStyle(Paint.Style.FILL_AND_STROKE);
+        paintCenter.setAntiAlias(true);
+        float centerRadius=2*baseRaidus*(minRadia/maxRadia)/5;
+        canvas.drawCircle(mCirX, mCirY, centerRadius, paintCenter);
+
         //外环
         paintLabel.setStyle(Paint.Style.STROKE);
-        paintLabel.setColor(Color.BLACK);
-        canvas.drawCircle(cirX, cirY, radius, paintLabel);
+        paintLabel.setStrokeWidth(Utils.sp2px(res,1));
+        paintLabel.setColor(Color.parseColor("#333333"));
+        canvas.drawCircle(mCirX, mCirY, mRadius, paintLabel);
+        canvas.drawCircle(mCirX, mCirY, centerRadius, paintLabel);
+        canvas.drawCircle(mCirX, mCirY, 3*centerRadius/4, paintLabel);
 
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+        handleTouchEvent(x,y);
+        return super.onTouchEvent(event);
+    }
+
+    private void handleTouchEvent(float x, float y) {
+
+
+    }
 
     public class XChartCalc {
         //Position位置

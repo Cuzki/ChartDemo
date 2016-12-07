@@ -5,7 +5,7 @@ package cuzki.chartgraphy;
  */
 
 public class RoseData implements ICombineDateProvider {
-    float[][]floats={{30,200},{40,350},{27,650},{50,135},{20,251}};
+    float[][]floats={{30,200},{40,350},{55,250},{60,115},{78,221}};
     String[] stings={"2016.1","2016.2","2016.3","2016.4","2016.5"};
     @Override
     public int getDateCount() {

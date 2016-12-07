@@ -394,7 +394,7 @@ public class ChartFragment extends Fragment {
         } else {
             mIsLoadDataCompleted = false;
             Log.i("cxy", "fragment" + mChartType + "请求数据");
-            mHandler.sendEmptyMessageDelayed(0, 2000);
+            mHandler.sendEmptyMessageDelayed(0, 1000);
         }
 
     }
@@ -467,7 +467,7 @@ public class ChartFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (mData != null) {
-            Log.i("cxy", "调用onSaveInstanceState  存入信息" + mData.getDateCount() + "条数");
+            Log.i("cxy", "调用onSaveInstanceState  存入信息" + mData.getChildCount() + "条数");
             outState.putSerializable(KEY_DATA, (Serializable) mData);
         }
     }
@@ -482,7 +482,7 @@ public class ChartFragment extends Fragment {
         Serializable serializable = savedInstanceState.getSerializable(KEY_DATA);
         if (serializable != null && serializable instanceof ICombineDateProvider) {
             mData = (ICombineDateProvider) savedInstanceState.getSerializable(KEY_DATA);
-            Log.i("cxy", "fragment" + mChartType + "调用onCreate获取到存储信息:  " + mData.getDateCount() + "条数");
+            Log.i("cxy", "fragment" + mChartType + "调用onCreate获取到存储信息:  " + mData.getChildCount() + "条数");
         }
     }
 
