@@ -58,7 +58,6 @@ public class PanelRoseView extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
     private void init() {
-        init();
     }
 
     public void setOnSelectedListener(onRosePanelSelectedListener selectedListener) {
@@ -235,7 +234,7 @@ public class PanelRoseView extends View {
             float endAngel=histroy.endAngel;
             float radiaus=histroy.radiaus;
             if(angel>=startAngel&&angel<=endAngel){
-                if(distance<=(radiaus*radiaus)){
+                if(distance>=(mCenterRadius*mCenterRadius)&&distance<=(radiaus*radiaus)){
                     mSelectedRoseIndex=i;//记录并重新绘制选中的部分
                 }else{//外围部分，取消选中状态
                     mSelectedRoseIndex=-1;
@@ -348,7 +347,6 @@ public class PanelRoseView extends View {
 
     interface onRosePanelSelectedListener{
         void onRosePanelSelected(int index);
-
     }
 
 }
