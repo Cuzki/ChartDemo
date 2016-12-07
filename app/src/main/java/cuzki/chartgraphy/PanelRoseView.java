@@ -20,8 +20,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cuzki.chartgraphy.R.color.tab_selected_color;
-
 /**
  * <p/>
  * 南丁格尔玫瑰图
@@ -39,7 +37,7 @@ public class PanelRoseView extends View {
 
     private onRosePanelSelectedListener mSelectedListener;
 
-    private final int COLOR_GROUP[]={R.color.colorAccent,R.color.colorPrimaryDark,R.color.colorPrimary,tab_selected_color,R.color.tab_color};
+    private final int COLOR_GROUP[]={R.color.color1,R.color.color2,R.color.color3,R.color.color4,R.color.color5};
 
     public PanelRoseView(Context context) {
         super(context);
