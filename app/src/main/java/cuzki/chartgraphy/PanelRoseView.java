@@ -12,10 +12,13 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import static cuzki.chartgraphy.R.color.tab_selected_color;
 
@@ -31,6 +34,8 @@ public class PanelRoseView extends View {
     private float mCirX=-1;
     private float mCirY=-1;
     private float mRadius=-1;
+    private float mCenterRadius=-1;
+    private int mSelectedRoseIndex=-1;
 
     private final int COLOR_GROUP[]={R.color.colorAccent,R.color.colorPrimaryDark,R.color.colorPrimary,tab_selected_color,R.color.tab_color};
 
@@ -68,22 +73,17 @@ public class PanelRoseView extends View {
         if(mDataProvider==null||mDataProvider.isEmpty()){
             mDataProvider=new PanelRoseEmptyDataProvider();
         }
+        mHistroyList.clear();
         if(mCirX<0||mCirY<0||mRadius<0){
             int hor = getWidth() - getPaddingLeft() - getPaddingRight();
             int vir = getHeight() - getPaddingTop() - getPaddingBottom();
             mCirX = hor / 2 + getPaddingLeft();//绘制圆心
             mCirY = vir / 2 + getPaddingTop();
-            mRadius = Math.min(hor, vir) *2/ 5;//本图最大半径,画外环用
+            mRadius = Math.min(hor, vir) *2/ 5;//本图所能取到的最大半径,画外环用
         }
 
 
         float labelRadius= (float) (mRadius*1.1);
-
-//        float arcLeft = cirX - radius;
-//        float arcTop = cirY - radius;
-//        float arcRight = cirX + radius;
-//        float arcBottom = cirY + radius;
-//        RectF arcRF0 = new RectF(arcLeft, arcTop, arcRight, arcBottom);//本图绘画区域
 
         //画笔初始化
         Paint paintArc = new Paint();
@@ -98,7 +98,7 @@ public class PanelRoseView extends View {
         float currPer = 0.0f;
 
         Resources res=getResources();
-        float baseRaidus = mRadius - Utils.dp2px(res,10);//南丁格尔玫瑰图最大半径值
+        float baseRaidus = mRadius - Utils.dp2px(res,10);//南丁格尔玫瑰图花瓣最大半径值
 
         float maxRadia = 0;
         float minRadia=Float.MAX_VALUE;
@@ -117,25 +117,28 @@ public class PanelRoseView extends View {
         if(mDataProvider.isEmpty() ){
             emptyColor=Color.parseColor("#e4e4e4");
         }
+
         for (int i = 0; i < mDataProvider.getDateCount(); i++) {
-            //将百分比转换为新扇区的半径
             if(mDataProvider.getY(i,1)==0||mDataProvider.getY(i,0)==0){
                 continue;
             }
-
             int color=emptyColor==-1?res.getColor(COLOR_GROUP[i%COLOR_GROUP.length]):emptyColor;
-
             float thisRadius = baseRaidus * mDataProvider.getY(i,0) / maxRadia;
-            float NewarcLeft = mCirX - thisRadius;
-            float NewarcTop = mCirY - thisRadius;
-            float NewarcRight = mCirX + thisRadius;
-            float NewarcBottom = mCirY + thisRadius;
-            RectF NewarcRF = new RectF(NewarcLeft, NewarcTop, NewarcRight, NewarcBottom);
-
+            float newarcLeft = mCirX - thisRadius;
+            float newarcTop = mCirY - thisRadius;
+            float newarcRight = mCirX + thisRadius;
+            float newarcBottom = mCirY + thisRadius;
+            RectF newarcRF = new RectF(newarcLeft, newarcTop, newarcRight, newarcBottom);
             paintArc.setColor(color);
-            //在饼图中显示所占比例
             float percentage = 360 * mDataProvider.getY(i,1)/ totle;
-            canvas.drawArc(NewarcRF, currPer, percentage, true, paintArc);
+            if(mSelectedRoseIndex==i){
+                float offset=Utils.dp2px(res,3);
+                RectF selectedcRF = new RectF(newarcLeft-offset, newarcTop-offset, newarcRight+offset, newarcBottom+offset);
+                canvas.drawArc(selectedcRF, currPer, percentage, true, paintArc);
+            }
+            canvas.drawArc(newarcRF, currPer, percentage, true, paintArc);
+
+            mHistroyList.add(new RoseHistroy(currPer,currPer+percentage,thisRadius));
 
             if(TextUtils.isEmpty(mDataProvider.getLabel(i))){
                 currPer += percentage;
@@ -172,13 +175,6 @@ public class PanelRoseView extends View {
             currPer += percentage;
         }
 
-//        paintLabel.setStyle(Paint.Style.STROKE);
-//        paintLabel.setColor(Color.WHITE);
-//        canvas.drawCircle(cirX, cirY, (1/3)*baseRaidus, paintLabel);
-//
-//        paintLabel.setStyle(Paint.Style.STROKE);
-//        paintLabel.setColor(Color.BLACK);
-
         Paint paintCenter = new Paint();
         paintCenter.setColor(Color.WHITE);
         paintCenter.setStyle(Paint.Style.FILL_AND_STROKE);
@@ -193,6 +189,8 @@ public class PanelRoseView extends View {
         canvas.drawCircle(mCirX, mCirY, mRadius, paintLabel);
         canvas.drawCircle(mCirX, mCirY, centerRadius, paintLabel);
         canvas.drawCircle(mCirX, mCirY, 3*centerRadius/4, paintLabel);
+        mCenterRadius=centerRadius;
+
 
     }
 
@@ -205,8 +203,36 @@ public class PanelRoseView extends View {
     }
 
     private void handleTouchEvent(float x, float y) {
+        // 将屏幕中的点转换成以屏幕中心为原点的坐标点
+        float mx = x - mCirX;
+        float my = y - mCirY;
+        float distance = mx * mx + my * my;
+        float piAngel= (float) Math.atan2((float)my,(float)mx);
+        if(piAngel<0){
+            piAngel= (float) (piAngel+Math.PI*2);
+        }
+        final float angel= (float) ((float) piAngel*180/Math.PI);//计算角度
 
-
+        final int selectedIndex=mSelectedRoseIndex;
+//        Log.i("cxy","piAngel="+piAngel+"  angel="+angel+"-mx="+mx+"-  my="+my);
+        for(int i=0;i<mHistroyList.size();i++){
+            RoseHistroy histroy=mHistroyList.get(i);
+            float startAngel=histroy.startAngel;
+            float endAngel=histroy.endAngel;
+            float radiaus=histroy.radiaus;
+            if(angel>=startAngel&&angel<=endAngel){
+                if(distance<=(radiaus*radiaus)){
+                    mSelectedRoseIndex=i;//记录并重新绘制选中的部分
+                }else{//外围部分，取消选中状态
+                    mSelectedRoseIndex=-1;
+                }
+                break;
+            }
+        }
+        if(mSelectedRoseIndex!=selectedIndex){//有变化，需要重绘
+            Log.i("cxy","选中 mSelectedRoseIndex="+mSelectedRoseIndex);
+            invalidate();
+        }
     }
 
     public class XChartCalc {
@@ -287,4 +313,19 @@ public class PanelRoseView extends View {
             return floats[0].length;
         }
     }
+
+    private class RoseHistroy{
+
+        public RoseHistroy(float startAngel, float endAngel, float radiaus) {
+            this.startAngel = startAngel;
+            this.endAngel = endAngel;
+            this.radiaus = radiaus;
+        }
+
+        float startAngel;
+        float endAngel;
+        float radiaus;
+    }
+
+    private final  List<RoseHistroy> mHistroyList=new ArrayList<RoseHistroy>();
 }
