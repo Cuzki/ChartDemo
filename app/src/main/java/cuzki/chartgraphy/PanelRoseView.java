@@ -37,6 +37,8 @@ public class PanelRoseView extends View {
     private float mCenterRadius=-1;
     private int mSelectedRoseIndex=-1;
 
+    private onRosePanelSelectedListener mSelectedListener;
+
     private final int COLOR_GROUP[]={R.color.colorAccent,R.color.colorPrimaryDark,R.color.colorPrimary,tab_selected_color,R.color.tab_color};
 
     public PanelRoseView(Context context) {
@@ -50,13 +52,17 @@ public class PanelRoseView extends View {
 
     public PanelRoseView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        init();
     }
-
     public PanelRoseView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
-
     private void init() {
+        init();
+    }
+
+    public void setOnSelectedListener(onRosePanelSelectedListener selectedListener) {
+        this.mSelectedListener = selectedListener;
     }
 
     public void setPanelRoseData(ICombineDateProvider panelRoseData){
@@ -84,12 +90,11 @@ public class PanelRoseView extends View {
 
 
         float labelRadius= (float) (mRadius*1.1);
+        Resources res=getResources();
 
         //画笔初始化
         Paint paintArc = new Paint();
         Paint paintLabel = new Paint();
-        paintLabel.setTextSize(16);
-
         paintLabel.setAntiAlias(true);
         paintArc.setAntiAlias(true);
         //位置计算类
@@ -97,7 +102,6 @@ public class PanelRoseView extends View {
 
         float currPer = 0.0f;
 
-        Resources res=getResources();
         float baseRaidus = mRadius - Utils.dp2px(res,10);//南丁格尔玫瑰图花瓣最大半径值
 
         float maxRadia = 0;
@@ -118,6 +122,11 @@ public class PanelRoseView extends View {
             emptyColor=Color.parseColor("#e4e4e4");
         }
 
+        if(maxRadia==0||totle==0){//无效数据，无法计算(被除数)，故设置默认显示样式
+            mDataProvider=new PanelRoseEmptyDataProvider();
+            invalidate();
+            return;
+        }
         for (int i = 0; i < mDataProvider.getDateCount(); i++) {
             if(mDataProvider.getY(i,1)==0||mDataProvider.getY(i,0)==0){
                 continue;
@@ -129,13 +138,16 @@ public class PanelRoseView extends View {
             float newarcRight = mCirX + thisRadius;
             float newarcBottom = mCirY + thisRadius;
             RectF newarcRF = new RectF(newarcLeft, newarcTop, newarcRight, newarcBottom);
-            paintArc.setColor(color);
             float percentage = 360 * mDataProvider.getY(i,1)/ totle;
             if(mSelectedRoseIndex==i){
                 float offset=Utils.dp2px(res,3);
+                paintArc.setStyle(Paint.Style.FILL_AND_STROKE);
                 RectF selectedcRF = new RectF(newarcLeft-offset, newarcTop-offset, newarcRight+offset, newarcBottom+offset);
+                paintArc.setColor(Color.RED);
                 canvas.drawArc(selectedcRF, currPer, percentage, true, paintArc);
             }
+            paintArc.setColor(color);
+            paintArc.setStyle(Paint.Style.FILL_AND_STROKE);
             canvas.drawArc(newarcRF, currPer, percentage, true, paintArc);
 
             mHistroyList.add(new RoseHistroy(currPer,currPer+percentage,thisRadius));
@@ -145,6 +157,8 @@ public class PanelRoseView extends View {
                 continue;
             }
             paintLabel.setColor(color);
+            paintLabel.setStrokeWidth(Utils.sp2px(res,mSelectedRoseIndex==i?1:0.5f));
+            paintLabel.setTextSize(Utils.sp2px(res,mSelectedRoseIndex==i?12:8));
             //计算百分比标签
             float lineAngel=currPer + percentage / 2;
 
@@ -184,7 +198,7 @@ public class PanelRoseView extends View {
 
         //外环
         paintLabel.setStyle(Paint.Style.STROKE);
-        paintLabel.setStrokeWidth(Utils.sp2px(res,1));
+        paintLabel.setStrokeWidth(Utils.dp2px(res,1));
         paintLabel.setColor(Color.parseColor("#333333"));
         canvas.drawCircle(mCirX, mCirY, mRadius, paintLabel);
         canvas.drawCircle(mCirX, mCirY, centerRadius, paintLabel);
@@ -232,6 +246,9 @@ public class PanelRoseView extends View {
         if(mSelectedRoseIndex!=selectedIndex){//有变化，需要重绘
             Log.i("cxy","选中 mSelectedRoseIndex="+mSelectedRoseIndex);
             invalidate();
+            if(mSelectedListener!=null){
+                mSelectedListener.onRosePanelSelected(mSelectedRoseIndex);
+            }
         }
     }
 
@@ -328,4 +345,10 @@ public class PanelRoseView extends View {
     }
 
     private final  List<RoseHistroy> mHistroyList=new ArrayList<RoseHistroy>();
+
+    interface onRosePanelSelectedListener{
+        void onRosePanelSelected(int index);
+
+    }
+
 }
