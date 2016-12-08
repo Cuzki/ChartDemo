@@ -7,6 +7,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.view.OrientationEventListener;
@@ -18,6 +19,7 @@ import android.view.OrientationEventListener;
  */
 public class LandChartActivity extends FragmentActivity {
     public static final String KEY_PAGE_TYPE="KEY_PAGE_TYPE";
+    private int mPageType;
     OrientationEventListener mOrientationListener;
     Handler mHandler =new Handler(){
         @Override
@@ -36,9 +38,13 @@ public class LandChartActivity extends FragmentActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        int pagetype=getIntent().getIntExtra(KEY_PAGE_TYPE,0);
+        if(savedInstanceState!=null){
+            mPageType=savedInstanceState.getInt(KEY_PAGE_TYPE,0);
+        }else {
+            mPageType=getIntent().getIntExtra(KEY_PAGE_TYPE,0);
+        }
         setContentView(R.layout.cloudoffice_data_chart_activity);
-        getSupportFragmentManager().beginTransaction().add(R.id.fl_container,ViewPagerChartsFragment.newInstance(pagetype), "viewpage").commitAllowingStateLoss();
+        getSupportFragmentManager().beginTransaction().add(R.id.fl_container,ViewPagerChartsFragment.newInstance(mPageType), "viewpage").commitAllowingStateLoss();
         mOrientationListener = new OrientationEventListener(this,
                 SensorManager.SENSOR_DELAY_NORMAL) {
 
@@ -83,4 +89,14 @@ public class LandChartActivity extends FragmentActivity {
         mOrientationListener.disable();
 
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        if(outState!=null){
+            outState.putInt(KEY_PAGE_TYPE, mPageType);
+        }
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
+
+
 }
