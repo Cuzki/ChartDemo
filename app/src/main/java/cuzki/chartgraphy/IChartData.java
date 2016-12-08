@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  * @author Cuzki
  */
-public interface ICombineDateProvider extends Serializable {
+public interface IChartData extends Serializable {
 
     int getDateCount();
 
@@ -18,7 +18,9 @@ public interface ICombineDateProvider extends Serializable {
 
     float getY(int indexX,int indexY);
 
-    String getLabel(int indexX);
+    String getCoordinateLabel(int indexX);
+
+    String getValueLabel(int indexX);
 
     boolean isEmpty();
 }

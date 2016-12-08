@@ -27,7 +27,7 @@ import java.util.List;
  * @author Cuzki
  */
 public class PanelRoseView extends View {
-    ICombineDateProvider mDataProvider;
+    IChartData mDataProvider;
 
     private float mCirX=-1;
     private float mCirY=-1;
@@ -35,8 +35,9 @@ public class PanelRoseView extends View {
     private float mCenterRadius=-1;
     private int mSelectedRoseIndex=-1;
 
-    private onRosePanelSelectedListener mSelectedListener;
+    private boolean mDrawCenter=false;
 
+    private onRosePanelSelectedListener mSelectedListener;
     private final int COLOR_GROUP[]={R.color.color1,R.color.color2,R.color.color3,R.color.color4,R.color.color5};
 
     public PanelRoseView(Context context) {
@@ -52,8 +53,17 @@ public class PanelRoseView extends View {
         super(context, attrs, defStyleAttr);
         init();
     }
+
     public PanelRoseView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
+        init();
+    }
+    public boolean isDrawCenter() {
+        return mDrawCenter;
+    }
+
+    public void setDrawCenter(boolean drawCenter) {
+        this.mDrawCenter = drawCenter;
     }
     private void init() {
     }
@@ -62,7 +72,7 @@ public class PanelRoseView extends View {
         this.mSelectedListener = selectedListener;
     }
 
-    public void setPanelRoseData(ICombineDateProvider panelRoseData){
+    public void setPanelRoseData(IChartData panelRoseData){
         mDataProvider=panelRoseData;
         if(mDataProvider==null||mDataProvider.isEmpty()){
             mDataProvider=new PanelRoseEmptyDataProvider();
@@ -85,7 +95,6 @@ public class PanelRoseView extends View {
             mRadius = Math.min(hor, vir) *2/ 5;//本图所能取到的最大半径,画外环用
         }
 
-
         float labelRadius= (float) (mRadius*1.1);
         Resources res=getResources();
 
@@ -99,7 +108,7 @@ public class PanelRoseView extends View {
 
         float currPer = 0.0f;
 
-        float baseRaidus = mRadius - Utils.dp2px(res,10);//南丁格尔玫瑰图花瓣最大半径值
+        float baseRaidus = (float) (mRadius *0.9);//南丁格尔玫瑰图花瓣最大半径值
 
         float maxRadia = 0;
         float minRadia=Float.MAX_VALUE;
@@ -135,12 +144,14 @@ public class PanelRoseView extends View {
             float newarcRight = mCirX + thisRadius;
             float newarcBottom = mCirY + thisRadius;
             float percentage = 360 * mDataProvider.getY(i,1)/ totle;
+            mHistroyList.add(new RoseHistroy(currPer,currPer+percentage,thisRadius));
             if(mSelectedRoseIndex==i){
                 float offset=Utils.dp2px(res,3);
                 newarcLeft-=offset;
                 newarcTop-=offset;
                 newarcRight+=offset;
                 newarcBottom+=offset;
+                thisRadius+=offset;
 //                paintArc.setStyle(Paint.Style.FILL_AND_STROKE);
 //                RectF selectedcRF = new RectF(newarcLeft-offset, newarcTop-offset, newarcRight+offset, newarcBottom+offset);
 //                paintArc.setColor(Color.RED);
@@ -151,9 +162,7 @@ public class PanelRoseView extends View {
             paintArc.setStyle(Paint.Style.FILL_AND_STROKE);
             canvas.drawArc(newarcRF, currPer, percentage, true, paintArc);
 
-            mHistroyList.add(new RoseHistroy(currPer,currPer+percentage,thisRadius));
-
-            if(TextUtils.isEmpty(mDataProvider.getLabel(i))){
+            if(TextUtils.isEmpty(mDataProvider.getCoordinateLabel(i))){
                 currPer += percentage;
                 continue;
             }
@@ -180,31 +189,52 @@ public class PanelRoseView extends View {
             float lineEndX2=isRight?lineEndX1+distance:lineEndX1-distance;
             canvas.drawLine(lineStartX2, lineStartY2, lineEndX2,lineEndY2,paintLabel);//水平线
 
+            final String valueLabelString=mDataProvider.getValueLabel(i);
+            if(mSelectedRoseIndex==i&&!TextUtils.isEmpty(valueLabelString)){
+                xcalc.CalcArcEndPointXY(mCirX, mCirY, thisRadius*3/5, lineAngel);
+                Paint paintValue = new Paint();
+                paintValue.setTextSize(Utils.sp2px(res,10));
+                Paint.FontMetricsInt fmi = paintValue.getFontMetricsInt();
+
+                Rect textNum = new Rect();
+                paintValue.getTextBounds(valueLabelString, 0, valueLabelString.length(), textNum);
+                float textWidth=textNum.right-textNum.left;
+                float textHeight=textNum.bottom-textNum.top;
+                float textBaseLineX=xcalc.getPosX()-textWidth/2;
+                float textBaseLineY=xcalc.getPosY();
+                paintValue.setColor(Color.BLUE);
+                float offset=Utils.dp2px(res,3);
+                canvas.drawRect(new RectF(textBaseLineX-offset,textBaseLineY-offset+fmi.top,textBaseLineX+textWidth+offset,textBaseLineY+offset+fmi.bottom),paintValue);
+                paintValue.setColor(Color.WHITE);
+                canvas.drawText(valueLabelString, textBaseLineX,textBaseLineY, paintValue);
+            }
             Rect textbounds = new Rect();
-            paintLabel.getTextBounds(mDataProvider.getLabel(i), 0, mDataProvider.getLabel(i).length(), textbounds);
+            paintLabel.getTextBounds(mDataProvider.getCoordinateLabel(i), 0, mDataProvider.getCoordinateLabel(i).length(), textbounds);
             //标识
 
             float margin=Utils.dp2px(res,1.5f);
-            canvas.drawText(mDataProvider.getLabel(i), isRight?lineEndX2+margin:lineEndX2-textbounds.right-textbounds.left-margin, lineEndY2+(textbounds.bottom-textbounds.top)/3, paintLabel);
+            canvas.drawText(mDataProvider.getCoordinateLabel(i), isRight?lineEndX2+margin:lineEndX2-textbounds.right-textbounds.left-margin, lineEndY2+(textbounds.bottom-textbounds.top)/3, paintLabel);
             //下次的起始角度
             currPer += percentage;
         }
-
-        Paint paintCenter = new Paint();
-        paintCenter.setColor(Color.WHITE);
-        paintCenter.setStyle(Paint.Style.FILL_AND_STROKE);
-        paintCenter.setAntiAlias(true);
-        float centerRadius=2*baseRaidus*(minRadia/maxRadia)/5;
-        canvas.drawCircle(mCirX, mCirY, centerRadius, paintCenter);
 
         //外环
         paintLabel.setStyle(Paint.Style.STROKE);
         paintLabel.setStrokeWidth(Utils.dp2px(res,1));
         paintLabel.setColor(Color.parseColor("#333333"));
         canvas.drawCircle(mCirX, mCirY, mRadius, paintLabel);
-        canvas.drawCircle(mCirX, mCirY, centerRadius, paintLabel);
-        canvas.drawCircle(mCirX, mCirY, 3*centerRadius/4, paintLabel);
-        mCenterRadius=centerRadius;
+
+        if(mDrawCenter){
+            Paint paintCenter = new Paint();
+            paintCenter.setColor(Color.WHITE);
+            paintCenter.setStyle(Paint.Style.FILL_AND_STROKE);
+            paintCenter.setAntiAlias(true);
+            float centerRadius=2*baseRaidus*(minRadia/maxRadia)/5;
+            canvas.drawCircle(mCirX, mCirY, centerRadius, paintCenter);
+            canvas.drawCircle(mCirX, mCirY, centerRadius, paintLabel);
+            canvas.drawCircle(mCirX, mCirY, 3*centerRadius/4, paintLabel);
+            mCenterRadius=centerRadius;
+        }
 
 
     }
@@ -304,7 +334,7 @@ public class PanelRoseView extends View {
         }
     }
 
-    public class PanelRoseEmptyDataProvider implements ICombineDateProvider ,Serializable {
+    public class PanelRoseEmptyDataProvider implements IChartData,Serializable {
         float[][] floats={{4,1},{5,1},{6,1},{8,1}};
         @Override
         public int getDateCount() {
@@ -317,7 +347,12 @@ public class PanelRoseView extends View {
         }
 
         @Override
-        public String getLabel(int indexX) {
+        public String getCoordinateLabel(int indexX) {
+            return "";
+        }
+
+        @Override
+        public String getValueLabel(int indexX) {
             return "";
         }
 

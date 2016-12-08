@@ -56,7 +56,7 @@ public class ChartFragment extends Fragment {
     int mChartType;//区分图标类型
     int mServiceType;//区分业务类型
     View mChart;
-    private ICombineDateProvider mData;
+    private IChartData mData;
     private static final String ARG_CHART_TYPE = "ARG_CHART_TYPE";
     private static final String ARG_SERVICE_TYPE = "ARG_SERVICE_TYPE";
     private static final String KEY_DATA = "KEY_DATA";
@@ -136,12 +136,12 @@ public class ChartFragment extends Fragment {
                 title = "柱状图";
                 mChart = columnChartView;
                 break;
-            case 3://折线柱状混合图
+            case 3://自定义南丁格尔玫瑰图（兼自定义饼图）
                 PanelRoseView panelRoseView = new PanelRoseView(getActivity());
                 layout.addView(panelRoseView);
                 mChart = panelRoseView;
                 break;
-            case 4:
+            case 4://折线柱状混合图
                 ComboLineColumnChartView comboLineColumnChartView = new ComboLineColumnChartView(getActivity());
                 comboLineColumnChartView.setValueSelectionEnabled(true);
                 comboLineColumnChartView.setOnValueTouchListener(new ComboLineColumnChartOnValueSelectListener() {
@@ -167,7 +167,7 @@ public class ChartFragment extends Fragment {
                 layout.addView(comboLineColumnChartView);
                 mChart = comboLineColumnChartView;
                 break;
-            case 5:
+            case 5://框架饼图
                 PieChartView pieChartView = new PieChartView(getActivity());
                 pieChartView.setCircleFillRatio(0.8f);
                 pieChartView.setOnValueTouchListener(new PieChartOnValueSelectListener() {
@@ -212,7 +212,7 @@ public class ChartFragment extends Fragment {
         }
     }
 
-    private ComboLineColumnChartData generateComBineData(ICombineDateProvider provider) {
+    private ComboLineColumnChartData generateComBineData(IChartData provider) {
         if (provider == null) {
             provider = new NullChartDataProvider();
         }
@@ -241,7 +241,7 @@ public class ChartFragment extends Fragment {
         ComboLineColumnChartData data = new ComboLineColumnChartData(generateColumnData(provider, scale, sub), generateLineData(provider));
         List<AxisValue> axvalues = new ArrayList<AxisValue>();
         for (int i = 0; i < provider.getDateCount(); i++) {
-            AxisValue a = new AxisValue(i, provider.getLabel(i).toCharArray());
+            AxisValue a = new AxisValue(i, provider.getCoordinateLabel(i).toCharArray());
             axvalues.add(a);
         }
         Axis axisLeftY = new Axis().setHasLines(true).setFormatter(new HeightValueFormatter(scale, sub, 0));
@@ -254,7 +254,7 @@ public class ChartFragment extends Fragment {
         return data;
     }
 
-    private LineChartData generateLineData(ICombineDateProvider linePrivider) {
+    private LineChartData generateLineData(IChartData linePrivider) {
         if (linePrivider == null) {
             linePrivider = new NullChartDataProvider();
         }
@@ -276,7 +276,7 @@ public class ChartFragment extends Fragment {
 
     }
 
-    private ColumnChartData generateColumnData(ICombineDateProvider columeProvider, final float scale, final float sub) {
+    private ColumnChartData generateColumnData(IChartData columeProvider, final float scale, final float sub) {
         if (columeProvider == null) {
             columeProvider = new NullChartDataProvider();
         }
@@ -291,7 +291,7 @@ public class ChartFragment extends Fragment {
         return columnChartData;
     }
 
-    private LineChartData generateLineChartData(ICombineDateProvider providers) {
+    private LineChartData generateLineChartData(IChartData providers) {
         if (providers == null) {
             providers = new NullChartDataProvider();
         }
@@ -337,7 +337,7 @@ public class ChartFragment extends Fragment {
         return ValueShape.CIRCLE;
     }
 
-    private ColumnChartData generateColumnChartData(ICombineDateProvider provider) {
+    private ColumnChartData generateColumnChartData(IChartData provider) {
         if (provider == null) {
             provider = new NullChartDataProvider();
         }
@@ -349,7 +349,7 @@ public class ChartFragment extends Fragment {
                 values = new ArrayList<SubcolumnValue>();
                 values.add(new SubcolumnValue(provider.getY(i, j), ChartUtils.pickColor()).setLabel("" + (int) (provider.getY(i, j))));
                 columns.add(new Column(values).setHasLabelsOnlyForSelected(true));
-                AxisValue v = new AxisValue(i, provider.getLabel(i).toCharArray());
+                AxisValue v = new AxisValue(i, provider.getCoordinateLabel(i).toCharArray());
                 axvalues.add(v);
             }
         }
@@ -361,14 +361,14 @@ public class ChartFragment extends Fragment {
     }
 
 
-    private PieChartData generatePieChartData(ICombineDateProvider provider) {
+    private PieChartData generatePieChartData(IChartData provider) {
         if (provider == null) {
             provider = new NullChartDataProvider();
         }
 
         List<SliceValue> values = new ArrayList<SliceValue>();
         for (int i = 0; i < provider.getDateCount(); ++i) {
-            values.add(new SliceValue(provider.getY(i, 0), ChartUtils.pickColor()).setLabel(provider.getLabel(i)));
+            values.add(new SliceValue(provider.getY(i, 0), ChartUtils.pickColor()).setLabel(provider.getCoordinateLabel(i)));
         }
 
         PieChartData data = new PieChartData(values);
@@ -407,19 +407,19 @@ public class ChartFragment extends Fragment {
             mData = null;
             switch (mChartType) {//造假数据
                 case 1://线形图
-                    mData = new CombineDateProvider();
+                    mData = new ChartData();
                     break;
                 case 2://柱状图
-                    mData = new CombineDateProvider1();
+                    mData = new ChartData1();
                     break;
                 case 3://南丁格尔玫瑰图
                     mData=new RoseData();
                     break;
                 case 4://折线柱状混合图
-                    mData = new CombineDateProvider2();
+                    mData = new ChartData2();
                     break;
                 case 5:
-                    mData = new CombineDateProvider1();
+                    mData = new ChartData1();
                     break;
             }
             setChartData();
@@ -428,23 +428,23 @@ public class ChartFragment extends Fragment {
 
     private void setChartData() {
         switch (mChartType) {
-            case 1://线形图
+            case 1://hellochart 线形图
                 LineChartView lineChartView = (LineChartView) mChart;
                 lineChartView.setLineChartData(generateLineChartData(mData));
                 break;
-            case 2://柱状图
+            case 2://hellochart 柱状图
                 ColumnChartView columnChartView = (ColumnChartView) mChart;
                 columnChartView.setColumnChartData(generateColumnChartData(mData));
                 break;
-            case 3:
+            case 3://南丁格尔玫瑰图（兼自定义饼图）
                 PanelRoseView panelRoseView= (PanelRoseView) mChart;
                 panelRoseView.setPanelRoseData(mData);
                 break;
-            case 4://折线柱状混合图
+            case 4://hellochart 折线柱状混合图
                 ComboLineColumnChartView comboLineColumnChartView = (ComboLineColumnChartView) mChart;
                 comboLineColumnChartView.setComboLineColumnChartData(generateComBineData(mData));
                 break;
-            case 5:
+            case 5://hellochart 饼图
                 PieChartView pieChartView = (PieChartView) mChart;
                 pieChartView.setPieChartData(generatePieChartData(mData));
                 break;
@@ -480,8 +480,8 @@ public class ChartFragment extends Fragment {
             return;
         }
         Serializable serializable = savedInstanceState.getSerializable(KEY_DATA);
-        if (serializable != null && serializable instanceof ICombineDateProvider) {
-            mData = (ICombineDateProvider) savedInstanceState.getSerializable(KEY_DATA);
+        if (serializable != null && serializable instanceof IChartData) {
+            mData = (IChartData) savedInstanceState.getSerializable(KEY_DATA);
             Log.i("cxy", "fragment" + mChartType + "调用onCreate获取到存储信息:  " + mData.getChildCount() + "条数");
         }
     }

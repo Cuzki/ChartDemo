@@ -8,7 +8,7 @@ package cuzki.chartgraphy;
  *
  * @author Cuzki
  */
-public class CombineDateProvider implements ICombineDateProvider {
+public class ChartData implements IChartData {
     float[][] floats={{60,50,20},{32,10,150},{82,77,52},{20,14,50},{80,30,21},{50,44,232},{52,15,30},{72,21,10},{60,150,11},{60,151,89},{44,15,80},{45,60,10}};
     String[] stings={"2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1"};
     @Override
@@ -27,11 +27,16 @@ public class CombineDateProvider implements ICombineDateProvider {
     }
 
     @Override
-    public String getLabel(int indexX) {
+    public String getCoordinateLabel(int indexX) {
         if(indexX>=stings.length||stings[indexX]==null){
             return "";
         }
         return stings[indexX];
+    }
+
+    @Override
+    public String getValueLabel(int indexX) {
+        return null;
     }
 
     @Override

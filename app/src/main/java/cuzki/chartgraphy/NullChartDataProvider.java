@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  * @author Cuzki
  */
-public class NullChartDataProvider implements ICombineDateProvider ,Serializable {
+public class NullChartDataProvider implements IChartData,Serializable {
     @Override
     public int getDateCount() {
         return 0;
@@ -22,8 +22,13 @@ public class NullChartDataProvider implements ICombineDateProvider ,Serializable
     }
 
     @Override
-    public String getLabel(int indexX) {
+    public String getCoordinateLabel(int indexX) {
         return "";
+    }
+
+    @Override
+    public String getValueLabel(int indexX) {
+        return null;
     }
 
     @Override
