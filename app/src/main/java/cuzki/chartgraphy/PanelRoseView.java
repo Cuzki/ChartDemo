@@ -38,7 +38,8 @@ public class PanelRoseView extends View {
     private boolean mDrawCenter=false;
 
     private onRosePanelSelectedListener mSelectedListener;
-    private final int COLOR_GROUP[]={R.color.color1,R.color.color2,R.color.color3,R.color.color4,R.color.color5};
+    private final int DEFAULT_PANEL_COLOR_GROUP[]={R.color.color1,R.color.color2,R.color.color3,R.color.color4,R.color.color5};
+    private final int DEFAULT_VALUE_LABEL_COLOR_GROUP[]={R.color.color11,R.color.color22,R.color.color33,R.color.color44,R.color.color55};
 
     public PanelRoseView(Context context) {
         super(context);
@@ -137,7 +138,7 @@ public class PanelRoseView extends View {
             if(mDataProvider.getY(i,1)==0||mDataProvider.getY(i,0)==0){
                 continue;
             }
-            int color=emptyColor==-1?res.getColor(COLOR_GROUP[i%COLOR_GROUP.length]):emptyColor;
+            int color=emptyColor==-1?res.getColor(DEFAULT_PANEL_COLOR_GROUP[i% DEFAULT_PANEL_COLOR_GROUP.length]):emptyColor;
             float thisRadius = baseRaidus * mDataProvider.getY(i,0) / maxRadia;
             float newarcLeft = mCirX - thisRadius;
             float newarcTop = mCirY - thisRadius;
@@ -152,10 +153,6 @@ public class PanelRoseView extends View {
                 newarcRight+=offset;
                 newarcBottom+=offset;
                 thisRadius+=offset;
-//                paintArc.setStyle(Paint.Style.FILL_AND_STROKE);
-//                RectF selectedcRF = new RectF(newarcLeft-offset, newarcTop-offset, newarcRight+offset, newarcBottom+offset);
-//                paintArc.setColor(Color.RED);
-//                canvas.drawArc(selectedcRF, currPer, percentage, true, paintArc);
             }
             RectF newarcRF = new RectF(newarcLeft, newarcTop, newarcRight, newarcBottom);
             paintArc.setColor(color);
@@ -189,29 +186,13 @@ public class PanelRoseView extends View {
             float lineEndX2=isRight?lineEndX1+distance:lineEndX1-distance;
             canvas.drawLine(lineStartX2, lineStartY2, lineEndX2,lineEndY2,paintLabel);//水平线
 
-            final String valueLabelString=mDataProvider.getValueLabel(i);
-            if(mSelectedRoseIndex==i&&!TextUtils.isEmpty(valueLabelString)){
-                xcalc.CalcArcEndPointXY(mCirX, mCirY, thisRadius*3/5, lineAngel);
-                Paint paintValue = new Paint();
-                paintValue.setTextSize(Utils.sp2px(res,10));
-                Paint.FontMetricsInt fmi = paintValue.getFontMetricsInt();
-                Rect textNum = new Rect();
-                paintValue.getTextBounds(valueLabelString, 0, valueLabelString.length(), textNum);
-                float textWidth=textNum.right-textNum.left;
-                float textBaseLineX=xcalc.getPosX()-textWidth/2;
-                float textBaseLineY=xcalc.getPosY();
-                paintValue.setColor(Color.BLUE);
-                float offset=Utils.dp2px(res,3);
-                canvas.drawRect(new RectF(textBaseLineX-offset,textBaseLineY-offset/2+fmi.top,textBaseLineX+textWidth+offset,textBaseLineY+offset/2+fmi.bottom),paintValue);
-                paintValue.setColor(Color.WHITE);
-                canvas.drawText(valueLabelString, textBaseLineX,textBaseLineY, paintValue);
-            }
             Rect textbounds = new Rect();
             paintLabel.getTextBounds(mDataProvider.getCoordinateLabel(i), 0, mDataProvider.getCoordinateLabel(i).length(), textbounds);
             //标识
 
             float margin=Utils.dp2px(res,1.5f);
-            canvas.drawText(mDataProvider.getCoordinateLabel(i), isRight?lineEndX2+margin:lineEndX2-textbounds.right-textbounds.left-margin, lineEndY2+(textbounds.bottom-textbounds.top)/3, paintLabel);
+            Paint.FontMetricsInt fmi = paintLabel.getFontMetricsInt();
+            canvas.drawText(mDataProvider.getCoordinateLabel(i), isRight?lineEndX2+margin:lineEndX2-textbounds.right-textbounds.left-margin, lineEndY2+(fmi.bottom- textbounds.top)/2-fmi.bottom, paintLabel);
             //下次的起始角度
             currPer += percentage;
         }
@@ -234,6 +215,27 @@ public class PanelRoseView extends View {
             mCenterRadius=centerRadius;
         }
 
+        if(mSelectedRoseIndex>=0){
+            final String valueLabelString=mDataProvider.getValueLabel(mSelectedRoseIndex);
+            RoseHistroy histroy=null;
+            if(mHistroyList==null||mSelectedRoseIndex>=mHistroyList.size()||(histroy=mHistroyList.get(mSelectedRoseIndex))==null){
+                return;
+            }
+            xcalc.CalcArcEndPointXY(mCirX, mCirY, histroy.radiaus*3/5, (histroy.startAngel+histroy.endAngel)/2);
+            Paint paintValue = new Paint();
+            paintValue.setTextSize(Utils.sp2px(res,10));
+            Paint.FontMetricsInt fmi = paintValue.getFontMetricsInt();
+            Rect textNum = new Rect();
+            paintValue.getTextBounds(valueLabelString, 0, valueLabelString.length(), textNum);
+            float textWidth=textNum.right-textNum.left;
+            float textBaseLineX=xcalc.getPosX()-textWidth/2;
+            float textBaseLineY=xcalc.getPosY();
+            paintValue.setColor(res.getColor(DEFAULT_VALUE_LABEL_COLOR_GROUP[mSelectedRoseIndex%5]));
+            float offset=Utils.dp2px(res,3);
+            canvas.drawRect(new RectF(textBaseLineX-offset,textBaseLineY-offset/2+fmi.top,textBaseLineX+textWidth+offset,textBaseLineY+offset/2+fmi.bottom),paintValue);
+            paintValue.setColor(Color.WHITE);
+            canvas.drawText(valueLabelString, textBaseLineX,textBaseLineY, paintValue);
+        }
 
     }
 

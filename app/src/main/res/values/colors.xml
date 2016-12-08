@@ -4,12 +4,19 @@
     <color name="colorPrimaryDark">#FF7F50</color>
     <color name="colorAccent">#6495ED</color>
 
-    <color name="color1">#00FFFF</color>
-    <color name="color2">#9400D3</color>
-    <color name="color3">#FFA500</color>
-    <color name="color4">#ADFF2F</color>
-    <color name="color5">#F08080</color>
-    <color name="color6">#00FA9A</color>
+    <color name="color1">#9933FF</color>
+    <color name="color2">#66FF66</color>
+    <color name="color3">#33CCFF</color>
+    <color name="color4">#FF3300</color>
+    <color name="color5">#FF66FF</color>
+    <color name="color6">#CCCCCC</color>
+
+    <color name="color11">#660099</color>
+    <color name="color22">#339933</color>
+    <color name="color33">#3366FF</color>
+    <color name="color44">#FF0000</color>
+    <color name="color55">#CC33CC</color>
+    <color name="color66">#999999</color>
 
     <color name="tab_color">#444450</color>
     <color name="tab_indictor_color">#0bbfa2</color>

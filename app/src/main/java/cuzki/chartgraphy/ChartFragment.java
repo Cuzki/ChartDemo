@@ -138,6 +138,7 @@ public class ChartFragment extends Fragment {
                 break;
             case 3://自定义南丁格尔玫瑰图（兼自定义饼图）
                 PanelRoseView panelRoseView = new PanelRoseView(getActivity());
+                panelRoseView.setDrawCenter(true);
                 layout.addView(panelRoseView);
                 mChart = panelRoseView;
                 break;
