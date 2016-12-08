@@ -23,7 +23,6 @@ import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter;
 import lecho.lib.hellocharts.gesture.ContainerScrollType;
 import lecho.lib.hellocharts.gesture.ZoomType;
 import lecho.lib.hellocharts.listener.ComboLineColumnChartOnValueSelectListener;
-import lecho.lib.hellocharts.listener.PieChartOnValueSelectListener;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.AxisValue;
 import lecho.lib.hellocharts.model.Column;
@@ -41,7 +40,6 @@ import lecho.lib.hellocharts.view.AbstractChartView;
 import lecho.lib.hellocharts.view.ColumnChartView;
 import lecho.lib.hellocharts.view.ComboLineColumnChartView;
 import lecho.lib.hellocharts.view.LineChartView;
-import lecho.lib.hellocharts.view.PieChartView;
 
 /**
  * <p/>
@@ -114,6 +112,35 @@ public class ChartFragment extends Fragment {
 
     private void setService() {
         switch (mServiceType) {
+            case ViewPagerChartsFragment.SERVER_MEMBER_DISTRIBUTE:
+
+                break;
+            case ViewPagerChartsFragment.SERVER_SEX_DISTRIBUTE:
+
+                break;
+            case ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE:
+                break;
+            case ViewPagerChartsFragment.SERVER_QUALIFICATION_DISTRIBUTE:
+
+                break;
+            case ViewPagerChartsFragment.SERVER_COMPANY_LIFE_DISTRIBUTE:
+
+                break;
+            case ViewPagerChartsFragment.SERVER_RANK_DISTRIBUTE:
+
+                break;
+            case ViewPagerChartsFragment.SERVER_CURRENT_LEAVE_TIME_DISTRIBUTE:
+
+                break;
+            case ViewPagerChartsFragment.SERVER_CURRENT_LEAVE_REASON_DISTRIBUTE:
+
+                break;
+            case ViewPagerChartsFragment.SERVER_CURRENT_LEAVE_POSITION_DISTRIBUTE:
+
+                break;
+            case ViewPagerChartsFragment.SERVER_CURRENT_PROMOTE_DISTRIBUTE:
+
+                break;
 
 
         }
@@ -179,26 +206,26 @@ public class ChartFragment extends Fragment {
                 mRlChartContainer.addView(comboLineColumnChartView);
                 mChart = comboLineColumnChartView;
                 break;
-            case 5://框架饼图
-                PieChartView pieChartView = new PieChartView(getActivity());
-                pieChartView.setCircleFillRatio(0.8f);
-                pieChartView.setOnValueTouchListener(new PieChartOnValueSelectListener() {
-                    @Override
-                    public void onValueDeselected() {
-
-                    }
-
-                    @Override
-                    public void onValueSelected(int arcIndex, SliceValue value) {
-
-                    }
-                });
-                /** Note: Chart is within ViewPager so enable container scroll mode. **/
-                pieChartView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
-                pieChartView.setValueSelectionEnabled(true);
-                mRlChartContainer.addView(pieChartView);
-                mChart = pieChartView;
-                break;
+//            case 5://框架饼图
+//                PieChartView pieChartView = new PieChartView(getActivity());
+//                pieChartView.setCircleFillRatio(0.8f);
+//                pieChartView.setOnValueTouchListener(new PieChartOnValueSelectListener() {
+//                    @Override
+//                    public void onValueDeselected() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onValueSelected(int arcIndex, SliceValue value) {
+//
+//                    }
+//                });
+//                /** Note: Chart is within ViewPager so enable container scroll mode. **/
+//                pieChartView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
+//                pieChartView.setValueSelectionEnabled(true);
+//                mRlChartContainer.addView(pieChartView);
+//                mChart = pieChartView;
+//                break;
         }
         mTvTitle.setText(mChartName);
     }
@@ -355,17 +382,23 @@ public class ChartFragment extends Fragment {
         List<Column> columns = new ArrayList<Column>();
         List<SubcolumnValue> values;
         List<AxisValue> axvalues = new ArrayList<AxisValue>();
-        for (int j = 0; j < provider.getChildCount(); j++) {
-            for (int i = 0; i < provider.getDateCount(); ++i) {
-                values = new ArrayList<SubcolumnValue>();
-                values.add(new SubcolumnValue(provider.getY(i, j), ChartUtils.pickColor()).setLabel("" + (int) (provider.getY(i, j))));
-                columns.add(new Column(values).setHasLabelsOnlyForSelected(true));
-                AxisValue v = new AxisValue(i, provider.getCoordinateLabel(i).toCharArray());
-                axvalues.add(v);
+        for (int j = 0; j < provider.getDateCount(); j++) {
+            values = new ArrayList<SubcolumnValue>();
+            for (int i = 0; i < provider.getChildCount(); ++i) {
+                values.add(new SubcolumnValue(provider.getY(j, i), ChartUtils.pickColor()).setLabel("" + (int) (provider.getY(j, i))));
             }
+            Column column = new Column(values);
+            column.setHasLabels(true);
+            column.setHasLabelsOnlyForSelected(true);
+            columns.add(column);
+            AxisValue v = new AxisValue(j, provider.getCoordinateLabel(j).toCharArray());
+            axvalues.add(v);
         }
 
         ColumnChartData data = new ColumnChartData(columns);
+        if(mServiceType==ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE||mServiceType==ViewPagerChartsFragment.SERVER_RANK_P_DISTRIBUTE||mServiceType==ViewPagerChartsFragment.SERVER_RANK_M_DISTRIBUTE){
+            data.setStacked(true);
+        }
         data.setAxisXBottom(new Axis().setValues(axvalues).setHasLines(true).setMaxLabelChars(4).setHasTiltedLabels(true));
         data.setAxisYLeft(new Axis().setHasLines(true));
         return data;
@@ -421,7 +454,7 @@ public class ChartFragment extends Fragment {
                     mData = new ChartData();
                     break;
                 case 2://柱状图
-                    mData = new ChartData1();
+                    mData = (mServiceType==ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE||mServiceType==ViewPagerChartsFragment.SERVER_RANK_P_DISTRIBUTE||mServiceType==ViewPagerChartsFragment.SERVER_RANK_M_DISTRIBUTE)?new ChartData1():new ChartData0();
                     break;
                 case 3://南丁格尔玫瑰图
                     mData=new RoseData();
@@ -455,10 +488,10 @@ public class ChartFragment extends Fragment {
                 ComboLineColumnChartView comboLineColumnChartView = (ComboLineColumnChartView) mChart;
                 comboLineColumnChartView.setComboLineColumnChartData(generateComBineData(mData));
                 break;
-            case 5://hellochart 饼图
-                PieChartView pieChartView = (PieChartView) mChart;
-                pieChartView.setPieChartData(generatePieChartData(mData));
-                break;
+//            case 5://hellochart 饼图
+//                PieChartView pieChartView = (PieChartView) mChart;
+//                pieChartView.setPieChartData(generatePieChartData(mData));
+//                break;
         }
         if (mChart instanceof AbstractChartView) {
             ((AbstractChartView) mChart).startDataAnimation();

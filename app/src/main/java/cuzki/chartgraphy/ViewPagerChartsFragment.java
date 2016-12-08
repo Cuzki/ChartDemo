@@ -22,16 +22,16 @@ public class ViewPagerChartsFragment extends Fragment {
      */
     public static final int SERVER_MEMBER_DISTRIBUTE=1;//部门人员分布
     public static final int SERVER_SEX_DISTRIBUTE=2;//性别分布
-    public static final int SERVER_AGE_DISTRIBUTE=3;//年龄分布
+    public static final int SERVER_RANK_DISTRIBUTE=3;//职级分布
     public static final int SERVER_QUALIFICATION_DISTRIBUTE=4;//学历分布
     public static final int SERVER_COMPANY_LIFE_DISTRIBUTE=5;//司龄分布
-    public static final int SERVER_RANK_DISTRIBUTE=6;//职级分布
+    public static final int SERVER_AGE_DISTRIBUTE=6;//年龄分布
     public static final int SERVER_RANK_P_DISTRIBUTE=7;//P职级分布
     public static final int SERVER_RANK_M_DISTRIBUTE=8;//M职级分布
     public static final int SERVER_CURRENT_LEAVE_TIME_DISTRIBUTE=9;//近3年离职时间分析
     public static final int SERVER_CURRENT_LEAVE_REASON_DISTRIBUTE=10;//近3年离职原因分析
     public static final int SERVER_CURRENT_LEAVE_POSITION_DISTRIBUTE=11;//近3年离职岗位分析
-    public static final int SERVER_CURRENT_PROMOTE_DISTRIBUTE=11;//近3年晋升趋势分析
+    public static final int SERVER_CURRENT_PROMOTE_DISTRIBUTE=12;//近3年晋升趋势分析
 
 
 
