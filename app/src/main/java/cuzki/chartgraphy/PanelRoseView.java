@@ -134,15 +134,19 @@ public class PanelRoseView extends View {
             float newarcTop = mCirY - thisRadius;
             float newarcRight = mCirX + thisRadius;
             float newarcBottom = mCirY + thisRadius;
-            RectF newarcRF = new RectF(newarcLeft, newarcTop, newarcRight, newarcBottom);
             float percentage = 360 * mDataProvider.getY(i,1)/ totle;
             if(mSelectedRoseIndex==i){
                 float offset=Utils.dp2px(res,3);
-                paintArc.setStyle(Paint.Style.FILL_AND_STROKE);
-                RectF selectedcRF = new RectF(newarcLeft-offset, newarcTop-offset, newarcRight+offset, newarcBottom+offset);
-                paintArc.setColor(Color.RED);
-                canvas.drawArc(selectedcRF, currPer, percentage, true, paintArc);
+                newarcLeft-=offset;
+                newarcTop-=offset;
+                newarcRight+=offset;
+                newarcBottom+=offset;
+//                paintArc.setStyle(Paint.Style.FILL_AND_STROKE);
+//                RectF selectedcRF = new RectF(newarcLeft-offset, newarcTop-offset, newarcRight+offset, newarcBottom+offset);
+//                paintArc.setColor(Color.RED);
+//                canvas.drawArc(selectedcRF, currPer, percentage, true, paintArc);
             }
+            RectF newarcRF = new RectF(newarcLeft, newarcTop, newarcRight, newarcBottom);
             paintArc.setColor(color);
             paintArc.setStyle(Paint.Style.FILL_AND_STROKE);
             canvas.drawArc(newarcRF, currPer, percentage, true, paintArc);
