@@ -17,6 +17,7 @@ import android.view.OrientationEventListener;
  * @author Cuzki
  */
 public class LandChartActivity extends FragmentActivity {
+    public static final String KEY_PAGE_TYPE="KEY_PAGE_TYPE";
     OrientationEventListener mOrientationListener;
     Handler mHandler =new Handler(){
         @Override
@@ -35,8 +36,9 @@ public class LandChartActivity extends FragmentActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int pagetype=getIntent().getIntExtra(KEY_PAGE_TYPE,0);
         setContentView(R.layout.cloudoffice_data_chart_activity);
-        getSupportFragmentManager().beginTransaction().add(R.id.fl_container, new ViewPagerChartsFragment(), "viewpage").commitAllowingStateLoss();
+        getSupportFragmentManager().beginTransaction().add(R.id.fl_container,ViewPagerChartsFragment.newInstance(pagetype), "viewpage").commitAllowingStateLoss();
         mOrientationListener = new OrientationEventListener(this,
                 SensorManager.SENSOR_DELAY_NORMAL) {
 

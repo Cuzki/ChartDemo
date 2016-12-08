@@ -48,7 +48,7 @@ public class MemberStatisticFragment extends Fragment {
         datas.add(new StatisticData("总人数","70"));
         initStatisticCardData(datas);
 
-        getChildFragmentManager().beginTransaction().add(R.id.fl_container, new ViewPagerChartsFragment(), "viewpage").commitAllowingStateLoss();
+        getChildFragmentManager().beginTransaction().add(R.id.fl_container, ViewPagerChartsFragment.newInstance(0), "viewpage").commitAllowingStateLoss();
 
         mVpNewest.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override

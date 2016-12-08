@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -51,14 +50,18 @@ import lecho.lib.hellocharts.view.PieChartView;
  * @author Cuzki
  */
 public class ChartFragment extends Fragment {
-    RelativeLayout mRlTitleContainer;
+    RelativeLayout mRlChartContainer;
     TextView mTvTitle;
     int mChartType;//区分图标类型
     int mServiceType;//区分业务类型
     View mChart;
     private IChartData mData;
+    private String mChartName;
+
     private static final String ARG_CHART_TYPE = "ARG_CHART_TYPE";
     private static final String ARG_SERVICE_TYPE = "ARG_SERVICE_TYPE";
+    private static final String ARG_CHART_NAME_TYPE = "ARG_CHART_NAME_TYPE";
+
     private static final String KEY_DATA = "KEY_DATA";
 
     /**
@@ -81,11 +84,12 @@ public class ChartFragment extends Fragment {
      * @param serviceType 服务类型
      * @return
      */
-    public static ChartFragment newInstance(int chartType, int serviceType) {
+    public static ChartFragment newInstance(int chartType, int serviceType,String title) {
         ChartFragment fragment = new ChartFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_CHART_TYPE, chartType);
         args.putInt(ARG_SERVICE_TYPE, serviceType);
+        args.putString(ARG_CHART_NAME_TYPE, title);
         fragment.setArguments(args);
         return fragment;
     }
@@ -94,14 +98,15 @@ public class ChartFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         bundle = savedInstanceState;
         View rootView = inflater.inflate(R.layout.fragment_charts, container, false);
-        LinearLayout layout = (LinearLayout) rootView;
+        RelativeLayout layout = (RelativeLayout) rootView;
         mTvTitle = (TextView) rootView.findViewById(R.id.tv_chart_title);
-        mRlTitleContainer = (RelativeLayout) rootView.findViewById(R.id.rl_title_container);
+        mRlChartContainer = (RelativeLayout) rootView.findViewById(R.id.rl_chart_container);
 
         mChartType = getArguments().getInt(ARG_CHART_TYPE);
         mServiceType = getArguments().getInt(ARG_SERVICE_TYPE);
+        mChartName = getArguments().getString(ARG_CHART_NAME_TYPE);
         Log.i("cxy", "调用onCreateView chart= " + mChartType);
-        addChart(layout);
+        addChart();
         setService();
         mIsViewCreated = true;
         return rootView;
@@ -110,11 +115,11 @@ public class ChartFragment extends Fragment {
     private void setService() {
         switch (mServiceType) {
 
+
         }
     }
 
-    private void addChart(LinearLayout layout) {
-        String title = "";
+    private void addChart() {
         switch (mChartType) {
             case 1://线形图
                 LineChartView lineChartView = new LineChartView(getActivity());
@@ -122,8 +127,7 @@ public class ChartFragment extends Fragment {
                 /** Note: Chart is within ViewPager so enable container scroll mode. **/
                 lineChartView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
                 lineChartView.setValueSelectionEnabled(true);
-                layout.addView(lineChartView);
-                title = "线形图";
+                mRlChartContainer.addView(lineChartView);
                 mChart = lineChartView;
                 break;
             case 2://柱状图
@@ -132,14 +136,21 @@ public class ChartFragment extends Fragment {
                 columnChartView.setZoomType(ZoomType.HORIZONTAL);
                 /** Note: Chart is within ViewPager so enable container scroll mode. **/
                 columnChartView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
-                layout.addView(columnChartView);
-                title = "柱状图";
+                mRlChartContainer.addView(columnChartView);
                 mChart = columnChartView;
                 break;
             case 3://自定义南丁格尔玫瑰图（兼自定义饼图）
                 PanelRoseView panelRoseView = new PanelRoseView(getActivity());
                 panelRoseView.setDrawCenter(true);
-                layout.addView(panelRoseView);
+                panelRoseView.setOnSelectedListener(new PanelRoseView.onRosePanelSelectedListener() {
+                    @Override
+                    public void onRosePanelSelected(int index) {
+//                        FragmentTransaction transaction=ChartFragment.this.getChildFragmentManager().beginTransaction();
+//                        transaction.replace(R.id.rl_container,new TestFragment());
+//                        transaction.commitAllowingStateLoss();
+                    }
+                });
+                mRlChartContainer.addView(panelRoseView);
                 mChart = panelRoseView;
                 break;
             case 4://折线柱状混合图
@@ -165,7 +176,7 @@ public class ChartFragment extends Fragment {
                 comboLineColumnChartView.setZoomType(ZoomType.HORIZONTAL);
                 /** Note: Chart is within ViewPager so enable container scroll mode. **/
                 comboLineColumnChartView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
-                layout.addView(comboLineColumnChartView);
+                mRlChartContainer.addView(comboLineColumnChartView);
                 mChart = comboLineColumnChartView;
                 break;
             case 5://框架饼图
@@ -185,12 +196,11 @@ public class ChartFragment extends Fragment {
                 /** Note: Chart is within ViewPager so enable container scroll mode. **/
                 pieChartView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
                 pieChartView.setValueSelectionEnabled(true);
-                layout.addView(pieChartView);
-                title = "饼状图";
+                mRlChartContainer.addView(pieChartView);
                 mChart = pieChartView;
                 break;
         }
-        mTvTitle.setText(title);
+        mTvTitle.setText(mChartName);
     }
 
     private static class HeightValueFormatter extends SimpleAxisValueFormatter {

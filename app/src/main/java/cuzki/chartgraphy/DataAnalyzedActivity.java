@@ -14,7 +14,9 @@ import android.view.OrientationEventListener;
 import android.view.View;
 
 public class DataAnalyzedActivity extends FragmentActivity implements View.OnClickListener {
-    OrientationEventListener mOrientationListener;
+
+
+    OrientationEventListener mOrientationListener;//重力感应器
     private TabLayout mTab;
     private int  mCurrentFragmentPosition=0;
     boolean mIsAbleJump = true;
@@ -61,8 +63,9 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
                         "Orientation changed to " + orientation + "  " + mIsAbleJump);
                 if ((orientation == 270 || orientation == 90) && mIsAbleJump) {
                     mIsAbleJump = false;
-                    //todo mCurrentFragmentPosition 待判断
-                    DataAnalyzedActivity.this.startActivityForResult(new Intent(DataAnalyzedActivity.this, LandChartActivity.class), 10);
+                    Intent intent=new Intent(DataAnalyzedActivity.this,LandChartActivity.class);
+                    intent.putExtra(LandChartActivity.KEY_PAGE_TYPE,mCurrentFragmentPosition);
+                    DataAnalyzedActivity.this.startActivityForResult(intent, 10);
                 }
             }
         };
@@ -101,7 +104,7 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        mHandler.sendEmptyMessageDelayed(1, 3000);
+        mHandler.sendEmptyMessageDelayed(1, 1500);
         Log.i("cxys",
                 "onActivityResult ");
     }
@@ -150,4 +153,5 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
     @Override
     public void onClick(View view) {
     }
+
 }

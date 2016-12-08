@@ -22,7 +22,7 @@ public class MemberChangeAnalyzedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.cloudoffice_change_analyze_fragment,null);
 
-        getChildFragmentManager().beginTransaction().add(R.id.fl_container, new ViewPagerChartsFragment(), "viewpage").commitAllowingStateLoss();
+        getChildFragmentManager().beginTransaction().add(R.id.fl_container, ViewPagerChartsFragment.newInstance(1), "viewpage").commitAllowingStateLoss();
         return view;
     }
 }
