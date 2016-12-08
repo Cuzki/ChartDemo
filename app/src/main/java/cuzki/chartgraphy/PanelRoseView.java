@@ -195,16 +195,14 @@ public class PanelRoseView extends View {
                 Paint paintValue = new Paint();
                 paintValue.setTextSize(Utils.sp2px(res,10));
                 Paint.FontMetricsInt fmi = paintValue.getFontMetricsInt();
-
                 Rect textNum = new Rect();
                 paintValue.getTextBounds(valueLabelString, 0, valueLabelString.length(), textNum);
                 float textWidth=textNum.right-textNum.left;
-                float textHeight=textNum.bottom-textNum.top;
                 float textBaseLineX=xcalc.getPosX()-textWidth/2;
                 float textBaseLineY=xcalc.getPosY();
                 paintValue.setColor(Color.BLUE);
                 float offset=Utils.dp2px(res,3);
-                canvas.drawRect(new RectF(textBaseLineX-offset,textBaseLineY-offset+fmi.top,textBaseLineX+textWidth+offset,textBaseLineY+offset+fmi.bottom),paintValue);
+                canvas.drawRect(new RectF(textBaseLineX-offset,textBaseLineY-offset/2+fmi.top,textBaseLineX+textWidth+offset,textBaseLineY+offset/2+fmi.bottom),paintValue);
                 paintValue.setColor(Color.WHITE);
                 canvas.drawText(valueLabelString, textBaseLineX,textBaseLineY, paintValue);
             }
