@@ -83,6 +83,12 @@ public class PanelRoseView extends View {
         return this;
     }
 
+    public PanelRoseView setSelectPanel(int index){
+        mSelectedRoseIndex=index;
+        invalidate();
+        return this;
+    }
+
     public PanelRoseView setPanelRoseData(IChartData panelRoseData) {
         mDataProvider = panelRoseData;
         if (mDataProvider == null || mDataProvider.isEmpty()) {
