@@ -221,7 +221,7 @@ public class PanelRoseView extends View {
                 drawAngel+=mDividerAngel;
             }
             canvas.drawArc(newarcRF, currPer, drawAngel, true, paintArc);
-
+           //画扇形
             if (TextUtils.isEmpty(mDataProvider.getCoordinateLabel(i))) {
                 currPer += percentage;
                 continue;
@@ -252,7 +252,7 @@ public class PanelRoseView extends View {
 
             Rect textbounds = new Rect();
             paintLabel.getTextBounds(mDataProvider.getCoordinateLabel(i), 0, mDataProvider.getCoordinateLabel(i).length(), textbounds);
-            //标识
+            //画标识文本
 
             float margin = Utils.dp2px(res, 1.5f);
             Paint.FontMetricsInt fmi = paintLabel.getFontMetricsInt();
@@ -261,13 +261,13 @@ public class PanelRoseView extends View {
             currPer += percentage;
         }
 
-        //外环
+        //画最外环
         paintLabel.setStyle(Paint.Style.STROKE);
         paintLabel.setStrokeWidth(Utils.dp2px(res, 1));
         paintLabel.setColor(Color.parseColor("#333333"));
         canvas.drawCircle(mCirX, mCirY, mRadius, paintLabel);
 
-        if (mDrawCenter) {
+        if (mDrawCenter) {//画中心白色圆及内环
             paintCenter.setColor(Color.WHITE);
             paintCenter.setStyle(Paint.Style.FILL_AND_STROKE);
             paintCenter.setAntiAlias(true);
@@ -278,7 +278,7 @@ public class PanelRoseView extends View {
             mCenterRadius = centerRadius;
         }
 
-        if (mSelectedRoseIndex >= 0) {
+        if (mSelectedRoseIndex >= 0) {//画选中花瓣的数值及其标签
             final String valueLabelString = mDataProvider.getValueLabel(mSelectedRoseIndex,1);
             RoseHistroy histroy = null;
             if (mHistroyList == null || mSelectedRoseIndex >= mHistroyList.size() || (histroy = mHistroyList.get(mSelectedRoseIndex)) == null) {
@@ -292,7 +292,7 @@ public class PanelRoseView extends View {
             float textWidth = textNum.right - textNum.left;
             float textBaseLineX = xcalc.getPosX() - textWidth / 2;
             float textBaseLineY = xcalc.getPosY();
-            paintValue.setColor(res.getColor(DEFAULT_VALUE_LABEL_COLOR_GROUP[mSelectedRoseIndex % 5]));
+            paintValue.setColor(darkenColor(res.getColor(DEFAULT_PANEL_COLOR_GROUP[mSelectedRoseIndex % 5])));
             float offset = Utils.dp2px(res, 3);
             canvas.drawRect(new RectF(textBaseLineX - offset, textBaseLineY - offset / 2 + fmi.top, textBaseLineX + textWidth + offset, textBaseLineY + offset / 2 + fmi.bottom), paintValue);
             paintValue.setColor(Color.WHITE);
@@ -483,5 +483,18 @@ public class PanelRoseView extends View {
     interface onRosePanelSelectedListener {
         void onRosePanelSelected(int index);
     }
+
+    public static int darkenColor(int color) {
+        float[] hsv = new float[3];
+        int alpha = Color.alpha(color);
+        Color.colorToHSV(color, hsv);
+        hsv[1] = Math.min(hsv[1] * DARKEN_SATURATION, 1.0f);
+        hsv[2] = hsv[2] * DARKEN_INTENSITY;
+        int tempColor = Color.HSVToColor(hsv);
+        return Color.argb(alpha, Color.red(tempColor), Color.green(tempColor), Color.blue(tempColor));
+    }
+
+    private static final float DARKEN_SATURATION = 1.1f;
+    private static final float DARKEN_INTENSITY = 0.9f;
 
 }
