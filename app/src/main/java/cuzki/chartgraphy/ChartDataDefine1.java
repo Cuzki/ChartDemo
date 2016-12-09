@@ -3,6 +3,8 @@
  */
 package cuzki.chartgraphy;
 
+import android.graphics.Color;
+
 /**
  * <p/>
  *
@@ -42,5 +44,22 @@ public class ChartDataDefine1 implements IChartDataDefine {
     @Override
     public boolean isEmpty() {
         return false;
+    }
+
+    @Override
+    public int getChildColor(final int indexX,final int indexY) {
+        int color=0;
+        switch (indexY){
+            case 0:
+                color= Color.parseColor("#3366FF");
+                break;
+            case 1:
+                color= Color.parseColor("#999999");
+                break;
+            case 2:
+                color= Color.parseColor("#33CCFF");
+                break;
+        }
+        return color;
     }
 }

@@ -43,8 +43,6 @@ public class PanelRoseView extends View {
     private boolean  mEnableSelected=false;
     private boolean  mDrawEmpty=false;
     private onRosePanelSelectedListener mSelectedListener;
-    private final int DEFAULT_PANEL_COLOR_GROUP[] = {R.color.color1, R.color.color2, R.color.color3, R.color.color4, R.color.color5};
-    private final int DEFAULT_VALUE_LABEL_COLOR_GROUP[] = {R.color.color11, R.color.color22, R.color.color33, R.color.color44, R.color.color55};
 
     Paint paintArc;
     Paint paintLabel;
@@ -197,7 +195,7 @@ public class PanelRoseView extends View {
             if (mDataProvider.getValue(i, 1) <= 0 || mDataProvider.getValue(i, 0) <= 0) {
                 continue;
             }
-            int color = emptyColor == -1 ? res.getColor(DEFAULT_PANEL_COLOR_GROUP[i % DEFAULT_PANEL_COLOR_GROUP.length]) : emptyColor;
+            int color = emptyColor == -1 ? mDataProvider.getChildColor(1,i) : emptyColor;
             float thisRadius = baseRaidus * mDataProvider.getValue(i, 0) / maxRadia;
             float newarcLeft = mCirX - thisRadius;
             float newarcTop = mCirY - thisRadius;
@@ -292,7 +290,7 @@ public class PanelRoseView extends View {
             float textWidth = textNum.right - textNum.left;
             float textBaseLineX = xcalc.getPosX() - textWidth / 2;
             float textBaseLineY = xcalc.getPosY();
-            paintValue.setColor(darkenColor(res.getColor(DEFAULT_PANEL_COLOR_GROUP[mSelectedRoseIndex % 5])));
+            paintValue.setColor(darkenColor(mDataProvider.getChildColor(1,mSelectedRoseIndex)));
             float offset = Utils.dp2px(res, 3);
             canvas.drawRect(new RectF(textBaseLineX - offset, textBaseLineY - offset / 2 + fmi.top, textBaseLineX + textWidth + offset, textBaseLineY + offset / 2 + fmi.bottom), paintValue);
             paintValue.setColor(Color.WHITE);
@@ -431,6 +429,12 @@ public class PanelRoseView extends View {
         @Override
         public int getChildCount() {
             return floats[0].length;
+        }
+
+
+        @Override
+        public int getChildColor(final int indexX,final int indexY) {
+            return Color.parseColor("#999999");
         }
     }
 

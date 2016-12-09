@@ -1,5 +1,7 @@
 package cuzki.chartgraphy;
 
+import android.graphics.Color;
+
 /**
  * Created by Administrator on 2016/12/7 0007.
  */
@@ -39,6 +41,32 @@ public class RoseDataDefine implements IChartDataDefine {
     @Override
     public int getChildCount() {
         return floats[0].length;
+    }
+
+    @Override
+    public int getChildColor(final int indexX,final int indexY) {
+        int color=0;
+        switch (indexY){
+            case 0:
+                color= Color.parseColor("#9933FF");
+                break;
+            case 1:
+                color= Color.parseColor("#66FF66");
+                break;
+            case 2:
+                color= Color.parseColor("#33CCFF");
+                break;
+            case 3:
+                color= Color.parseColor("#FF3300");
+                break;
+            case 4:
+                color= Color.parseColor("#FF66FF");
+                break;
+            default:
+                color= Color.parseColor("#999999");
+                break;
+        }
+        return color;
     }
 }
 

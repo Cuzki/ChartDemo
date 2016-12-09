@@ -3,6 +3,8 @@
  */
 package cuzki.chartgraphy;
 
+import android.graphics.Color;
+
 import java.io.Serializable;
 
 /**
@@ -39,5 +41,22 @@ public class NullChartDataDefineProvider implements IChartDataDefine,Serializabl
     @Override
     public int getChildCount() {
         return 0;
+    }
+
+    @Override
+    public int getChildColor(final int indexX,final int indexY) {
+        int color=0;
+        switch (indexY){
+            case 0:
+                color= Color.parseColor("#9933FF");
+                break;
+            case 1:
+                color= Color.parseColor("#66FF66");
+                break;
+            case 2:
+                color= Color.parseColor("#33CCFF");
+                break;
+        }
+        return color;
     }
 }

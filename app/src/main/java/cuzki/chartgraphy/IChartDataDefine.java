@@ -49,4 +49,10 @@ public interface IChartDataDefine extends Serializable {
      * @return
      */
     boolean isEmpty();
+
+    /**
+     * 获取第indexY个Y组的色值
+     * @return 横坐标 color值
+     */
+    int getChildColor(int indexX,int indexY);
 }

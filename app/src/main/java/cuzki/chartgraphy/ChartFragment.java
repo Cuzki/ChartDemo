@@ -302,7 +302,7 @@ public class ChartFragment extends Fragment {
             values.add(new PointValue(j, linePrivider.getValue(j, 0)).setLabel(linePrivider.getValueLabel(j,0)));
         }
         Line line = new Line(values);
-        line.setColor(ChartUtils.pickColor());
+        line.setColor(linePrivider.getChildColor(0,0));
         line.setHasLabels(true);
         line.setHasLines(true);
         line.setHasPoints(false).setHasLabelsOnlyForSelected(true);
@@ -322,7 +322,7 @@ public class ChartFragment extends Fragment {
         List<SubcolumnValue> values;
         for (int i = 0; i < columeProvider.getDateCount(); ++i) {
             values = new ArrayList<SubcolumnValue>();
-            values.add(new SubcolumnValue(columeProvider.getValue(i, 1) * scale - sub, ChartUtils.COLOR_GREEN).setLabel(columeProvider.getValueLabel(i,1)));
+            values.add(new SubcolumnValue(columeProvider.getValue(i, 1) * scale - sub, columeProvider.getChildColor(i,1)).setLabel(columeProvider.getValueLabel(i,1)));
             columns.add(new Column(values).setHasLabelsOnlyForSelected(true));
         }
         ColumnChartData columnChartData = new ColumnChartData(columns);
@@ -340,7 +340,7 @@ public class ChartFragment extends Fragment {
                 values.add(new PointValue(i, providers.getValue(i - 1, j)).setLabel(providers.getValueLabel(i-1,j)));
             }
             Line line = new Line(values);
-            line.setColor(ChartUtils.pickColor());
+            line.setColor(providers.getChildColor(0,j));
             line.setFilled(true);
             line.setShape(getShape(j));
             line.setStrokeWidth(1).setHasLabelsOnlyForSelected(true);
@@ -385,7 +385,7 @@ public class ChartFragment extends Fragment {
         for (int j = 0; j < provider.getDateCount(); j++) {
             values = new ArrayList<SubcolumnValue>();
             for (int i = 0; i < provider.getChildCount(); ++i) {
-                values.add(new SubcolumnValue(provider.getValue(j, i), ChartUtils.pickColor()).setLabel(provider.getValueLabel(j,i)));
+                values.add(new SubcolumnValue(provider.getValue(j, i), provider.getChildColor(j,i)).setLabel(provider.getValueLabel(j,i)));
             }
             Column column = new Column(values);
             column.setHasLabels(true);
