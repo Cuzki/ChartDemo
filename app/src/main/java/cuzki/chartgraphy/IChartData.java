@@ -16,11 +16,11 @@ public interface IChartData extends Serializable {
 
     int getChildCount();
 
-    float getY(int indexX,int indexY);
+    float getValue(int indexX, int indexY);
 
     String getCoordinateLabel(int indexX);
 
-    String getValueLabel(int indexX);
+    String getValueLabel(int indexX,int indexY);
 
     boolean isEmpty();
 }

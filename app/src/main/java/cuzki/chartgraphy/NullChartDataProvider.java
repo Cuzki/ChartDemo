@@ -17,7 +17,7 @@ public class NullChartDataProvider implements IChartData,Serializable {
     }
 
     @Override
-    public float getY(int indexX,int indexY) {
+    public float getValue(int indexX, int indexY) {
         return 0;
     }
 
@@ -27,8 +27,8 @@ public class NullChartDataProvider implements IChartData,Serializable {
     }
 
     @Override
-    public String getValueLabel(int indexX) {
-        return null;
+    public String getValueLabel(int indexX,int indexY) {
+        return getValue(indexX,indexY)+"";
     }
 
     @Override

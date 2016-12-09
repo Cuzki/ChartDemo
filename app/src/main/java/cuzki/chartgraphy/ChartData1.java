@@ -10,7 +10,7 @@ package cuzki.chartgraphy;
  */
 public class ChartData1 implements IChartData {
     float[][]floats={{20,80},{50,50},{60,40},{38,62},{70,30},{22,77},{55,45},{41,59},{20,80},{90,10},{11,89},{0,100}};
-    String[] stings={"2016.1","2016.2","2016.3","2016.4","2016.5","2016.6","2016.7","2016.8","2016.9","2016.10","2016.11","2016.12"};
+    String[] stings={"100岁以上","90岁以上","80岁以上","60-50岁","50-40岁","40-30岁","30-25岁","25-22岁","22-20岁","20-18岁","18-17岁","17-15岁"};
     @Override
     public int getDateCount() {
         return floats.length;
@@ -22,7 +22,7 @@ public class ChartData1 implements IChartData {
     }
 
     @Override
-    public float getY(int indexX,int indexY) {
+    public float getValue(int indexX, int indexY) {
         return floats[indexX][indexY];
     }
 
@@ -35,8 +35,8 @@ public class ChartData1 implements IChartData {
     }
 
     @Override
-    public String getValueLabel(int indexX) {
-        return null;
+    public String getValueLabel(int indexX,int indexY) {
+        return floats[indexX][indexY]+"";
     }
 
     @Override

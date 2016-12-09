@@ -37,6 +37,7 @@ public class PanelRoseView extends View {
     private float mCenterRadius = -1;
     private int mSelectedRoseIndex = -1;
     private float mDividerAngel=0;
+    private float mDrawStartAngel=0;
 
     private boolean mDrawCenter = false;
     private boolean  mEnableSelected=false;
@@ -105,8 +106,21 @@ public class PanelRoseView extends View {
 
     public PanelRoseView setDividerAngel(float dividerAngel){
         mDividerAngel=dividerAngel;
+        while (mDividerAngel<0||mDividerAngel>=360){
+            mDividerAngel=0;
+        }
         return this;
     }
+
+    public PanelRoseView setStartDrawAngel(float startDrawAngel){
+        mDrawStartAngel=startDrawAngel;
+        while (mDrawStartAngel<0){
+            mDrawStartAngel+=360;
+        }
+        mDrawStartAngel=mDrawStartAngel%360;
+        return this;
+    }
+
 
     private void init() {
         paintArc = new Paint();
@@ -151,7 +165,7 @@ public class PanelRoseView extends View {
         //位置计算类
         XChartCalc xcalc = new XChartCalc();
 
-        float currPer = 0.0f;
+        float currPer = mDrawStartAngel;
 
         float baseRaidus = (float) (mRadius * 0.9);//南丁格尔玫瑰图花瓣最大半径值
 
@@ -159,8 +173,8 @@ public class PanelRoseView extends View {
         float minRadia = Float.MAX_VALUE;
         float totle = 0;
         for (int i = 0; i < mDataProvider.getDateCount(); i++) {
-            totle += mDataProvider.getY(i, 1);
-            float ra = mDataProvider.getY(i, 0);
+            totle += mDataProvider.getValue(i, 1);
+            float ra = mDataProvider.getValue(i, 0);
             if (maxRadia < ra) {
                 maxRadia = ra;
             }
@@ -180,16 +194,16 @@ public class PanelRoseView extends View {
             totle = 1;
         }
         for (int i = 0; i < mDataProvider.getDateCount(); i++) {
-            if (mDataProvider.getY(i, 1) <= 0 || mDataProvider.getY(i, 0) <= 0) {
+            if (mDataProvider.getValue(i, 1) <= 0 || mDataProvider.getValue(i, 0) <= 0) {
                 continue;
             }
             int color = emptyColor == -1 ? res.getColor(DEFAULT_PANEL_COLOR_GROUP[i % DEFAULT_PANEL_COLOR_GROUP.length]) : emptyColor;
-            float thisRadius = baseRaidus * mDataProvider.getY(i, 0) / maxRadia;
+            float thisRadius = baseRaidus * mDataProvider.getValue(i, 0) / maxRadia;
             float newarcLeft = mCirX - thisRadius;
             float newarcTop = mCirY - thisRadius;
             float newarcRight = mCirX + thisRadius;
             float newarcBottom = mCirY + thisRadius;
-            float percentage = 360 * mDataProvider.getY(i, 1) / totle;
+            float percentage = 360 * mDataProvider.getValue(i, 1) / totle;
             mHistroyList.add(new RoseHistroy(currPer, currPer + percentage, thisRadius));
             if (mSelectedRoseIndex == i) {
                 float offset = Utils.dp2px(res, 3);
@@ -230,7 +244,8 @@ public class PanelRoseView extends View {
             float lineStartX2 = lineEndX1;
             float lineStartY2 = lineEndY1;
             float lineEndY2 = lineEndY1;
-            final boolean isRight = (lineAngel >= 0 && lineAngel <= 90) || (lineAngel >= 270 && lineAngel <= 360);
+            float realAngel=lineAngel%360;
+            final boolean isRight = (realAngel >= 0 && realAngel <= 90) || (realAngel >= 270 && realAngel <= 360);
             float distance = Utils.dp2px(res, 10);
             float lineEndX2 = isRight ? lineEndX1 + distance : lineEndX1 - distance;
             canvas.drawLine(lineStartX2, lineStartY2, lineEndX2, lineEndY2, paintLabel);//水平线
@@ -264,7 +279,7 @@ public class PanelRoseView extends View {
         }
 
         if (mSelectedRoseIndex >= 0) {
-            final String valueLabelString = mDataProvider.getValueLabel(mSelectedRoseIndex);
+            final String valueLabelString = mDataProvider.getValueLabel(mSelectedRoseIndex,1);
             RoseHistroy histroy = null;
             if (mHistroyList == null || mSelectedRoseIndex >= mHistroyList.size() || (histroy = mHistroyList.get(mSelectedRoseIndex)) == null) {
                 return;
@@ -315,7 +330,7 @@ public class PanelRoseView extends View {
             float startAngel = histroy.startAngel;
             float endAngel = histroy.endAngel;
             float radiaus = histroy.radiaus;
-            if (angel >= startAngel && angel <= endAngel) {
+            if ((angel >= startAngel && angel <= endAngel)||(angel +360>= startAngel && angel+360 <= endAngel)) {
                 if (distance >= (mCenterRadius * mCenterRadius) && distance <= (radiaus * radiaus)) {
                     mSelectedRoseIndex = i;//记录并重新绘制选中的部分
                 } else {//外围部分，取消选中状态
@@ -394,7 +409,7 @@ public class PanelRoseView extends View {
         }
 
         @Override
-        public float getY(int indexX, int indexY) {
+        public float getValue(int indexX, int indexY) {
             return floats[indexX][indexY];
         }
 
@@ -404,7 +419,7 @@ public class PanelRoseView extends View {
         }
 
         @Override
-        public String getValueLabel(int indexX) {
+        public String getValueLabel(int indexX,int indexY) {
             return "";
         }
 

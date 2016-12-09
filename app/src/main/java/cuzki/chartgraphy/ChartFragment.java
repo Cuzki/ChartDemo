@@ -168,7 +168,7 @@ public class ChartFragment extends Fragment {
                 break;
             case 3://自定义南丁格尔玫瑰图（兼自定义饼图）
                 PanelRoseView panelRoseView = new PanelRoseView(getActivity());
-                panelRoseView.setDrawCenter(true).setSelectedMode(true).setDividerAngel(1)
+                panelRoseView.setDrawCenter(true).setSelectedMode(true).setDividerAngel(1).setStartDrawAngel(-90)
                         .setOnSelectedListener(new PanelRoseView.onRosePanelSelectedListener() {
                             @Override
                             public void onRosePanelSelected(int index) {
@@ -257,8 +257,8 @@ public class ChartFragment extends Fragment {
         //为了最优化显示，获取折线图最大值,折线图index 为0，柱状图为1
         float lineMax = 0;
         for (int i = 0; i < provider.getDateCount(); ++i) {
-            if (provider.getY(i, 0) > lineMax) {
-                lineMax = provider.getY(i, 0);
+            if (provider.getValue(i, 0) > lineMax) {
+                lineMax = provider.getValue(i, 0);
             }
         }
         final float tempoRange = lineMax;
@@ -266,11 +266,11 @@ public class ChartFragment extends Fragment {
         float columeMax = 0;
         float columeMin = 0;
         for (int i = 0; i < provider.getDateCount(); ++i) {
-            if (provider.getY(i, 1) > columeMax) {
-                columeMax = provider.getY(i, 1);
+            if (provider.getValue(i, 1) > columeMax) {
+                columeMax = provider.getValue(i, 1);
             }
-            if (provider.getY(i, 1) < columeMin) {
-                columeMin = provider.getY(i, 1);
+            if (provider.getValue(i, 1) < columeMin) {
+                columeMin = provider.getValue(i, 1);
             }
         }
         final float scale = tempoRange / columeMax;
@@ -299,7 +299,7 @@ public class ChartFragment extends Fragment {
         List<Line> lines = new ArrayList<Line>();
         List<PointValue> values = new ArrayList<PointValue>();
         for (int j = 0; j < linePrivider.getDateCount(); ++j) {
-            values.add(new PointValue(j, linePrivider.getY(j, 0)).setLabel("" + (int) (linePrivider.getY(j, 0))));
+            values.add(new PointValue(j, linePrivider.getValue(j, 0)).setLabel(linePrivider.getValueLabel(j,0)));
         }
         Line line = new Line(values);
         line.setColor(ChartUtils.pickColor());
@@ -322,7 +322,7 @@ public class ChartFragment extends Fragment {
         List<SubcolumnValue> values;
         for (int i = 0; i < columeProvider.getDateCount(); ++i) {
             values = new ArrayList<SubcolumnValue>();
-            values.add(new SubcolumnValue(columeProvider.getY(i, 1) * scale - sub, ChartUtils.COLOR_GREEN).setLabel((int) (columeProvider.getY(i, 1)) + ""));
+            values.add(new SubcolumnValue(columeProvider.getValue(i, 1) * scale - sub, ChartUtils.COLOR_GREEN).setLabel(columeProvider.getValueLabel(i,1)));
             columns.add(new Column(values).setHasLabelsOnlyForSelected(true));
         }
         ColumnChartData columnChartData = new ColumnChartData(columns);
@@ -337,7 +337,7 @@ public class ChartFragment extends Fragment {
         for (int j = 0; j < providers.getChildCount(); j++) {
             List<PointValue> values = new ArrayList<PointValue>();
             for (int i = 1; i <= providers.getDateCount(); ++i) {
-                values.add(new PointValue(i, providers.getY(i - 1, j)).setLabel("" + (int) (providers.getY(i - 1, j))));
+                values.add(new PointValue(i, providers.getValue(i - 1, j)).setLabel(providers.getValueLabel(i-1,j)));
             }
             Line line = new Line(values);
             line.setColor(ChartUtils.pickColor());
@@ -385,7 +385,7 @@ public class ChartFragment extends Fragment {
         for (int j = 0; j < provider.getDateCount(); j++) {
             values = new ArrayList<SubcolumnValue>();
             for (int i = 0; i < provider.getChildCount(); ++i) {
-                values.add(new SubcolumnValue(provider.getY(j, i), ChartUtils.pickColor()).setLabel("" + (int) (provider.getY(j, i))));
+                values.add(new SubcolumnValue(provider.getValue(j, i), ChartUtils.pickColor()).setLabel(provider.getValueLabel(j,i)));
             }
             Column column = new Column(values);
             column.setHasLabels(true);
@@ -399,7 +399,7 @@ public class ChartFragment extends Fragment {
         if (mServiceType == ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_P_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_M_DISTRIBUTE) {
             data.setStacked(true);
         }
-        data.setAxisXBottom(new Axis().setValues(axvalues).setHasLines(true).setMaxLabelChars(4).setHasTiltedLabels(true));
+        data.setAxisXBottom(new Axis().setValues(axvalues).setHasLines(true).setMaxLabelChars(4).setHasTiltedLabels(true).setTextSize(8));
         data.setAxisYLeft(new Axis().setHasLines(true));
         return data;
     }
@@ -412,7 +412,7 @@ public class ChartFragment extends Fragment {
 
         List<SliceValue> values = new ArrayList<SliceValue>();
         for (int i = 0; i < provider.getDateCount(); ++i) {
-            values.add(new SliceValue(provider.getY(i, 0), ChartUtils.pickColor()).setLabel(provider.getCoordinateLabel(i)));
+            values.add(new SliceValue(provider.getValue(i, 0), ChartUtils.pickColor()).setLabel(provider.getCoordinateLabel(i)));
         }
 
         PieChartData data = new PieChartData(values);

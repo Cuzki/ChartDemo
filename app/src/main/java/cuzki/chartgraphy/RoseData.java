@@ -14,7 +14,7 @@ public class RoseData implements IChartData {
     }
 
     @Override
-    public float getY(int indexX,int indexY) {
+    public float getValue(int indexX, int indexY) {
         return floats[indexX][indexY];
     }
 
@@ -27,11 +27,8 @@ public class RoseData implements IChartData {
     }
 
     @Override
-    public String getValueLabel(int indexX) {
-        if(indexX>=stingv.length||stingv[indexX]==null){
-            return "";
-        }
-        return stingv[indexX];
+    public String getValueLabel(int indexX,int indexY) {
+        return ""+ getValue(indexX,indexY);
     }
 
     @Override
