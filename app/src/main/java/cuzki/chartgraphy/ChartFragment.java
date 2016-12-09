@@ -82,7 +82,7 @@ public class ChartFragment extends Fragment {
      * @param serviceType 服务类型
      * @return
      */
-    public static ChartFragment newInstance(int chartType, int serviceType,String title) {
+    public static ChartFragment newInstance(int chartType, int serviceType, String title) {
         ChartFragment fragment = new ChartFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_CHART_TYPE, chartType);
@@ -168,15 +168,15 @@ public class ChartFragment extends Fragment {
                 break;
             case 3://自定义南丁格尔玫瑰图（兼自定义饼图）
                 PanelRoseView panelRoseView = new PanelRoseView(getActivity());
-                panelRoseView.setDrawCenter(true);
-                panelRoseView.setOnSelectedListener(new PanelRoseView.onRosePanelSelectedListener() {
-                    @Override
-                    public void onRosePanelSelected(int index) {
+                panelRoseView.setDrawCenter(true).setSelectedMode(true).setDividerAngel(1)
+                        .setOnSelectedListener(new PanelRoseView.onRosePanelSelectedListener() {
+                            @Override
+                            public void onRosePanelSelected(int index) {
 //                        FragmentTransaction transaction=ChartFragment.this.getChildFragmentManager().beginTransaction();
 //                        transaction.replace(R.id.rl_container,new TestFragment());
 //                        transaction.commitAllowingStateLoss();
-                    }
-                });
+                            }
+                        });
                 mRlChartContainer.addView(panelRoseView);
                 mChart = panelRoseView;
                 break;
@@ -396,7 +396,7 @@ public class ChartFragment extends Fragment {
         }
 
         ColumnChartData data = new ColumnChartData(columns);
-        if(mServiceType==ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE||mServiceType==ViewPagerChartsFragment.SERVER_RANK_P_DISTRIBUTE||mServiceType==ViewPagerChartsFragment.SERVER_RANK_M_DISTRIBUTE){
+        if (mServiceType == ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_P_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_M_DISTRIBUTE) {
             data.setStacked(true);
         }
         data.setAxisXBottom(new Axis().setValues(axvalues).setHasLines(true).setMaxLabelChars(4).setHasTiltedLabels(true));
@@ -454,10 +454,10 @@ public class ChartFragment extends Fragment {
                     mData = new ChartData();
                     break;
                 case 2://柱状图
-                    mData = (mServiceType==ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE||mServiceType==ViewPagerChartsFragment.SERVER_RANK_P_DISTRIBUTE||mServiceType==ViewPagerChartsFragment.SERVER_RANK_M_DISTRIBUTE)?new ChartData1():new ChartData0();
+                    mData = (mServiceType == ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_P_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_M_DISTRIBUTE) ? new ChartData1() : new ChartData0();
                     break;
                 case 3://南丁格尔玫瑰图
-                    mData=new RoseData();
+                    mData = new RoseData();
                     break;
                 case 4://折线柱状混合图
                     mData = new ChartData2();
@@ -481,7 +481,7 @@ public class ChartFragment extends Fragment {
                 columnChartView.setColumnChartData(generateColumnChartData(mData));
                 break;
             case 3://南丁格尔玫瑰图（兼自定义饼图）
-                PanelRoseView panelRoseView= (PanelRoseView) mChart;
+                PanelRoseView panelRoseView = (PanelRoseView) mChart;
                 panelRoseView.setPanelRoseData(mData);
                 break;
             case 4://hellochart 折线柱状混合图

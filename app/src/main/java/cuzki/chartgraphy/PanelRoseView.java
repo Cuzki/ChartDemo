@@ -29,17 +29,24 @@ import java.util.List;
 public class PanelRoseView extends View {
     IChartData mDataProvider;
 
-    private float mCirX=-1;
-    private float mCirY=-1;
-    private float mRadius=-1;
-    private float mCenterRadius=-1;
-    private int mSelectedRoseIndex=-1;
+    private float mCirX = -1;
+    private float mCirY = -1;
+    private float mRadius = -1;
+    private float mCenterRadius = -1;
+    private int mSelectedRoseIndex = -1;
+    private float mDividerAngel=0;
 
-    private boolean mDrawCenter=false;
-
+    private boolean mDrawCenter = false;
+    private boolean  mEnableSelected=false;
+    private boolean  mDrawEmpty=false;
     private onRosePanelSelectedListener mSelectedListener;
-    private final int DEFAULT_PANEL_COLOR_GROUP[]={R.color.color1,R.color.color2,R.color.color3,R.color.color4,R.color.color5};
-    private final int DEFAULT_VALUE_LABEL_COLOR_GROUP[]={R.color.color11,R.color.color22,R.color.color33,R.color.color44,R.color.color55};
+    private final int DEFAULT_PANEL_COLOR_GROUP[] = {R.color.color1, R.color.color2, R.color.color3, R.color.color4, R.color.color5};
+    private final int DEFAULT_VALUE_LABEL_COLOR_GROUP[] = {R.color.color11, R.color.color22, R.color.color33, R.color.color44, R.color.color55};
+
+    Paint paintArc;
+    Paint paintLabel;
+    Paint paintCenter;
+    Paint paintValue;
 
     public PanelRoseView(Context context) {
         super(context);
@@ -59,191 +66,226 @@ public class PanelRoseView extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
         init();
     }
+
     public boolean isDrawCenter() {
         return mDrawCenter;
     }
 
-    public void setDrawCenter(boolean drawCenter) {
+    public PanelRoseView setDrawCenter(boolean drawCenter) {
         this.mDrawCenter = drawCenter;
-    }
-    private void init() {
+        return this;
     }
 
-    public void setOnSelectedListener(onRosePanelSelectedListener selectedListener) {
+    public PanelRoseView setOnSelectedListener(onRosePanelSelectedListener selectedListener) {
         this.mSelectedListener = selectedListener;
+        return this;
     }
 
-    public void setPanelRoseData(IChartData panelRoseData){
-        mDataProvider=panelRoseData;
-        if(mDataProvider==null||mDataProvider.isEmpty()){
-            mDataProvider=new PanelRoseEmptyDataProvider();
+    public PanelRoseView setPanelRoseData(IChartData panelRoseData) {
+        mDataProvider = panelRoseData;
+        if (mDataProvider == null || mDataProvider.isEmpty()) {
+            mDataProvider = new PanelRoseEmptyDataProvider();
         }
         invalidate();
+        return this;
+    }
+
+    public PanelRoseView setSelectedMode(boolean enableSelected){
+        mEnableSelected=enableSelected;
+        return this;
+    }
+
+    public PanelRoseView setDividerAngel(float dividerAngel){
+        mDividerAngel=dividerAngel;
+        return this;
+    }
+
+    private void init() {
+        paintArc = new Paint();
+        paintLabel = new Paint();
+        paintCenter = new Paint();
+        paintValue = new Paint();
+
+        paintLabel.setAntiAlias(true);
+        paintArc.setAntiAlias(true);
+        paintValue.setAntiAlias(true);
+        paintCenter.setAntiAlias(true);
+
+        paintCenter.setColor(Color.WHITE);
+        paintCenter.setStyle(Paint.Style.FILL_AND_STROKE);
+        paintValue.setTextSize(Utils.sp2px(getResources(), 10));
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if(mDataProvider==null||mDataProvider.isEmpty()){
-            mDataProvider=new PanelRoseEmptyDataProvider();
+        if (mDataProvider == null || mDataProvider.isEmpty()) {
+            mDataProvider = new PanelRoseEmptyDataProvider();
+            mDrawEmpty=true;
+        }else {
+            mDrawEmpty=false;
+        }
+        if (paintArc == null || paintLabel == null || paintCenter == null || paintValue == null) {
+            init();
         }
         mHistroyList.clear();
-        if(mCirX<0||mCirY<0||mRadius<0){
+        if (mCirX < 0 || mCirY < 0 || mRadius < 0) {
             int hor = getWidth() - getPaddingLeft() - getPaddingRight();
             int vir = getHeight() - getPaddingTop() - getPaddingBottom();
             mCirX = hor / 2 + getPaddingLeft();//绘制圆心
             mCirY = vir / 2 + getPaddingTop();
-            mRadius = Math.min(hor, vir) *2/ 5;//本图所能取到的最大半径,画外环用
+            mRadius = Math.min(hor, vir) * 2 / 5;//本图所能取到的最大半径,画外环用
         }
 
-        float labelRadius= (float) (mRadius*1.1);
-        Resources res=getResources();
+        float labelRadius = (float) (mRadius * 1.1);
+        Resources res = getResources();
 
-        //画笔初始化
-        Paint paintArc = new Paint();
-        Paint paintLabel = new Paint();
-        paintLabel.setAntiAlias(true);
-        paintArc.setAntiAlias(true);
         //位置计算类
         XChartCalc xcalc = new XChartCalc();
 
         float currPer = 0.0f;
 
-        float baseRaidus = (float) (mRadius *0.9);//南丁格尔玫瑰图花瓣最大半径值
+        float baseRaidus = (float) (mRadius * 0.9);//南丁格尔玫瑰图花瓣最大半径值
 
         float maxRadia = 0;
-        float minRadia=Float.MAX_VALUE;
+        float minRadia = Float.MAX_VALUE;
         float totle = 0;
-        for (int i=0; i<mDataProvider.getDateCount(); i++) {
-            totle += mDataProvider.getY(i,1);
-            float ra=mDataProvider.getY(i,0);
+        for (int i = 0; i < mDataProvider.getDateCount(); i++) {
+            totle += mDataProvider.getY(i, 1);
+            float ra = mDataProvider.getY(i, 0);
             if (maxRadia < ra) {
                 maxRadia = ra;
             }
-            if (minRadia > ra&&ra>0) {
+            if (minRadia > ra && ra > 0) {
                 minRadia = ra;
             }
         }
-        int emptyColor=-1;
-        if(mDataProvider.isEmpty() ){
-            emptyColor=Color.parseColor("#e4e4e4");
+        int emptyColor = -1;
+        if (mDataProvider.isEmpty()) {
+            emptyColor = Color.parseColor("#e4e4e4");
         }
 
-        if(maxRadia==0||totle==0){//无效数据，无法计算(被除数)，故设置默认显示样式
-            mDataProvider=new PanelRoseEmptyDataProvider();
-            invalidate();
-            return;
+        if (maxRadia == 0) {//无效数据，无法计算(被除数),被除数不能为0,（认为每个部分都为0）
+            maxRadia = 1;
+        }
+        if (totle == 0) {//无效数据，无法计算(被除数),被除数不能为0,（认为每个部分都为0）
+            totle = 1;
         }
         for (int i = 0; i < mDataProvider.getDateCount(); i++) {
-            if(mDataProvider.getY(i,1)==0||mDataProvider.getY(i,0)==0){
+            if (mDataProvider.getY(i, 1) <= 0 || mDataProvider.getY(i, 0) <= 0) {
                 continue;
             }
-            int color=emptyColor==-1?res.getColor(DEFAULT_PANEL_COLOR_GROUP[i% DEFAULT_PANEL_COLOR_GROUP.length]):emptyColor;
-            float thisRadius = baseRaidus * mDataProvider.getY(i,0) / maxRadia;
+            int color = emptyColor == -1 ? res.getColor(DEFAULT_PANEL_COLOR_GROUP[i % DEFAULT_PANEL_COLOR_GROUP.length]) : emptyColor;
+            float thisRadius = baseRaidus * mDataProvider.getY(i, 0) / maxRadia;
             float newarcLeft = mCirX - thisRadius;
             float newarcTop = mCirY - thisRadius;
             float newarcRight = mCirX + thisRadius;
             float newarcBottom = mCirY + thisRadius;
-            float percentage = 360 * mDataProvider.getY(i,1)/ totle;
-            mHistroyList.add(new RoseHistroy(currPer,currPer+percentage,thisRadius));
-            if(mSelectedRoseIndex==i){
-                float offset=Utils.dp2px(res,3);
-                newarcLeft-=offset;
-                newarcTop-=offset;
-                newarcRight+=offset;
-                newarcBottom+=offset;
-                thisRadius+=offset;
+            float percentage = 360 * mDataProvider.getY(i, 1) / totle;
+            mHistroyList.add(new RoseHistroy(currPer, currPer + percentage, thisRadius));
+            if (mSelectedRoseIndex == i) {
+                float offset = Utils.dp2px(res, 3);
+                newarcLeft -= offset;
+                newarcTop -= offset;
+                newarcRight += offset;
+                newarcBottom += offset;
+                thisRadius += offset;
             }
             RectF newarcRF = new RectF(newarcLeft, newarcTop, newarcRight, newarcBottom);
             paintArc.setColor(color);
             paintArc.setStyle(Paint.Style.FILL_AND_STROKE);
-            canvas.drawArc(newarcRF, currPer, percentage, true, paintArc);
+            float drawAngel=percentage-mDividerAngel;
+            if(drawAngel<=0){
+                drawAngel+=mDividerAngel;
+            }
+            canvas.drawArc(newarcRF, currPer, drawAngel, true, paintArc);
 
-            if(TextUtils.isEmpty(mDataProvider.getCoordinateLabel(i))){
+            if (TextUtils.isEmpty(mDataProvider.getCoordinateLabel(i))) {
                 currPer += percentage;
                 continue;
             }
             paintLabel.setColor(color);
-            paintLabel.setStrokeWidth(Utils.sp2px(res,mSelectedRoseIndex==i?1:0.5f));
-            paintLabel.setTextSize(Utils.sp2px(res,mSelectedRoseIndex==i?12:8));
+            paintLabel.setStrokeWidth(Utils.sp2px(res, mSelectedRoseIndex == i ? 1 : 0.5f));
+            paintLabel.setTextSize(Utils.sp2px(res, mSelectedRoseIndex == i ? 12 : 8));
             //计算百分比标签
-            float lineAngel=currPer + percentage / 2;
+            float lineAngel = currPer + (drawAngel) / 2;
 
             xcalc.CalcArcEndPointXY(mCirX, mCirY, thisRadius, lineAngel);
-            float lineStartX1=xcalc.getPosX();
-            float lineStartY1= xcalc.getPosY();
+            float lineStartX1 = xcalc.getPosX();
+            float lineStartY1 = xcalc.getPosY();
 
             xcalc.CalcArcEndPointXY(mCirX, mCirY, labelRadius, lineAngel);
-            float lineEndX1=xcalc.getPosX();
-            float lineEndY1= xcalc.getPosY();
-            canvas.drawLine(lineStartX1, lineStartY1, lineEndX1,lineEndY1,paintLabel);//斜线
+            float lineEndX1 = xcalc.getPosX();
+            float lineEndY1 = xcalc.getPosY();
+            canvas.drawLine(lineStartX1, lineStartY1, lineEndX1, lineEndY1, paintLabel);//斜线
 
-            float lineStartX2=lineEndX1;
-            float lineStartY2= lineEndY1;
-            float lineEndY2= lineEndY1;
-            final boolean isRight=(lineAngel>=0&&lineAngel<=90)||(lineAngel>=270&&lineAngel<=360);
-            float distance=Utils.dp2px(res,10);
-            float lineEndX2=isRight?lineEndX1+distance:lineEndX1-distance;
-            canvas.drawLine(lineStartX2, lineStartY2, lineEndX2,lineEndY2,paintLabel);//水平线
+            float lineStartX2 = lineEndX1;
+            float lineStartY2 = lineEndY1;
+            float lineEndY2 = lineEndY1;
+            final boolean isRight = (lineAngel >= 0 && lineAngel <= 90) || (lineAngel >= 270 && lineAngel <= 360);
+            float distance = Utils.dp2px(res, 10);
+            float lineEndX2 = isRight ? lineEndX1 + distance : lineEndX1 - distance;
+            canvas.drawLine(lineStartX2, lineStartY2, lineEndX2, lineEndY2, paintLabel);//水平线
 
             Rect textbounds = new Rect();
             paintLabel.getTextBounds(mDataProvider.getCoordinateLabel(i), 0, mDataProvider.getCoordinateLabel(i).length(), textbounds);
             //标识
 
-            float margin=Utils.dp2px(res,1.5f);
+            float margin = Utils.dp2px(res, 1.5f);
             Paint.FontMetricsInt fmi = paintLabel.getFontMetricsInt();
-            canvas.drawText(mDataProvider.getCoordinateLabel(i), isRight?lineEndX2+margin:lineEndX2-textbounds.right-textbounds.left-margin, lineEndY2+(fmi.bottom- textbounds.top)/2-fmi.bottom, paintLabel);
+            canvas.drawText(mDataProvider.getCoordinateLabel(i), isRight ? lineEndX2 + margin : lineEndX2 - textbounds.right - textbounds.left - margin, lineEndY2 + (fmi.bottom - textbounds.top) / 2 - fmi.bottom, paintLabel);
             //下次的起始角度
             currPer += percentage;
         }
 
         //外环
         paintLabel.setStyle(Paint.Style.STROKE);
-        paintLabel.setStrokeWidth(Utils.dp2px(res,1));
+        paintLabel.setStrokeWidth(Utils.dp2px(res, 1));
         paintLabel.setColor(Color.parseColor("#333333"));
         canvas.drawCircle(mCirX, mCirY, mRadius, paintLabel);
 
-        if(mDrawCenter){
-            Paint paintCenter = new Paint();
+        if (mDrawCenter) {
             paintCenter.setColor(Color.WHITE);
             paintCenter.setStyle(Paint.Style.FILL_AND_STROKE);
             paintCenter.setAntiAlias(true);
-            float centerRadius=2*baseRaidus*(minRadia/maxRadia)/5;
+            float centerRadius = 2 * baseRaidus * (minRadia / maxRadia) / 5;
             canvas.drawCircle(mCirX, mCirY, centerRadius, paintCenter);
             canvas.drawCircle(mCirX, mCirY, centerRadius, paintLabel);
-            canvas.drawCircle(mCirX, mCirY, 3*centerRadius/4, paintLabel);
-            mCenterRadius=centerRadius;
+            canvas.drawCircle(mCirX, mCirY, 3 * centerRadius / 4, paintLabel);
+            mCenterRadius = centerRadius;
         }
 
-        if(mSelectedRoseIndex>=0){
-            final String valueLabelString=mDataProvider.getValueLabel(mSelectedRoseIndex);
-            RoseHistroy histroy=null;
-            if(mHistroyList==null||mSelectedRoseIndex>=mHistroyList.size()||(histroy=mHistroyList.get(mSelectedRoseIndex))==null){
+        if (mSelectedRoseIndex >= 0) {
+            final String valueLabelString = mDataProvider.getValueLabel(mSelectedRoseIndex);
+            RoseHistroy histroy = null;
+            if (mHistroyList == null || mSelectedRoseIndex >= mHistroyList.size() || (histroy = mHistroyList.get(mSelectedRoseIndex)) == null) {
                 return;
             }
-            xcalc.CalcArcEndPointXY(mCirX, mCirY, histroy.radiaus*3/5, (histroy.startAngel+histroy.endAngel)/2);
-            Paint paintValue = new Paint();
-            paintValue.setTextSize(Utils.sp2px(res,10));
+            xcalc.CalcArcEndPointXY(mCirX, mCirY, histroy.radiaus * 3 / 5, (histroy.startAngel + histroy.endAngel) / 2);
+            paintValue.setTextSize(Utils.sp2px(res, 9));
             Paint.FontMetricsInt fmi = paintValue.getFontMetricsInt();
             Rect textNum = new Rect();
             paintValue.getTextBounds(valueLabelString, 0, valueLabelString.length(), textNum);
-            float textWidth=textNum.right-textNum.left;
-            float textBaseLineX=xcalc.getPosX()-textWidth/2;
-            float textBaseLineY=xcalc.getPosY();
-            paintValue.setColor(res.getColor(DEFAULT_VALUE_LABEL_COLOR_GROUP[mSelectedRoseIndex%5]));
-            float offset=Utils.dp2px(res,3);
-            canvas.drawRect(new RectF(textBaseLineX-offset,textBaseLineY-offset/2+fmi.top,textBaseLineX+textWidth+offset,textBaseLineY+offset/2+fmi.bottom),paintValue);
+            float textWidth = textNum.right - textNum.left;
+            float textBaseLineX = xcalc.getPosX() - textWidth / 2;
+            float textBaseLineY = xcalc.getPosY();
+            paintValue.setColor(res.getColor(DEFAULT_VALUE_LABEL_COLOR_GROUP[mSelectedRoseIndex % 5]));
+            float offset = Utils.dp2px(res, 3);
+            canvas.drawRect(new RectF(textBaseLineX - offset, textBaseLineY - offset / 2 + fmi.top, textBaseLineX + textWidth + offset, textBaseLineY + offset / 2 + fmi.bottom), paintValue);
             paintValue.setColor(Color.WHITE);
-            canvas.drawText(valueLabelString, textBaseLineX,textBaseLineY, paintValue);
+            canvas.drawText(valueLabelString, textBaseLineX, textBaseLineY, paintValue);
         }
 
     }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-        handleTouchEvent(x,y);
+        if(mEnableSelected&&!mDrawEmpty){
+            handleTouchEvent(x, y);
+        }
         return super.onTouchEvent(event);
     }
 
@@ -252,32 +294,32 @@ public class PanelRoseView extends View {
         float mx = x - mCirX;
         float my = y - mCirY;
         float distance = mx * mx + my * my;
-        float piAngel= (float) Math.atan2((float)my,(float)mx);
-        if(piAngel<0){
-            piAngel= (float) (piAngel+Math.PI*2);
+        float piAngel = (float) Math.atan2((float) my, (float) mx);
+        if (piAngel < 0) {
+            piAngel = (float) (piAngel + Math.PI * 2);
         }
-        final float angel= (float) ((float) piAngel*180/Math.PI);//计算角度
+        final float angel = (float) ((float) piAngel * 180 / Math.PI);//计算角度
 
-        final int selectedIndex=mSelectedRoseIndex;
+        final int selectedIndex = mSelectedRoseIndex;
 //        Log.i("cxy","piAngel="+piAngel+"  angel="+angel+"-mx="+mx+"-  my="+my);
-        for(int i=0;i<mHistroyList.size();i++){
-            RoseHistroy histroy=mHistroyList.get(i);
-            float startAngel=histroy.startAngel;
-            float endAngel=histroy.endAngel;
-            float radiaus=histroy.radiaus;
-            if(angel>=startAngel&&angel<=endAngel){
-                if(distance>=(mCenterRadius*mCenterRadius)&&distance<=(radiaus*radiaus)){
-                    mSelectedRoseIndex=i;//记录并重新绘制选中的部分
-                }else{//外围部分，取消选中状态
-                    mSelectedRoseIndex=-1;
+        for (int i = 0; i < mHistroyList.size(); i++) {
+            RoseHistroy histroy = mHistroyList.get(i);
+            float startAngel = histroy.startAngel;
+            float endAngel = histroy.endAngel;
+            float radiaus = histroy.radiaus;
+            if (angel >= startAngel && angel <= endAngel) {
+                if (distance >= (mCenterRadius * mCenterRadius) && distance <= (radiaus * radiaus)) {
+                    mSelectedRoseIndex = i;//记录并重新绘制选中的部分
+                } else {//外围部分，取消选中状态
+                    mSelectedRoseIndex = -1;
                 }
                 break;
             }
         }
-        if(mSelectedRoseIndex!=selectedIndex){//有变化，需要重绘
-            Log.i("cxy","选中 mSelectedRoseIndex="+mSelectedRoseIndex);
+        if (mSelectedRoseIndex != selectedIndex) {//有变化，需要重绘
+            Log.i("cxy", "选中 mSelectedRoseIndex=" + mSelectedRoseIndex);
             invalidate();
-            if(mSelectedListener!=null){
+            if (mSelectedListener != null) {
                 mSelectedListener.onRosePanelSelected(mSelectedRoseIndex);
             }
         }
@@ -287,6 +329,7 @@ public class PanelRoseView extends View {
         //Position位置
         private float posX = 0.0f;
         private float posY = 0.0f;
+
         public XChartCalc() {
         }
 
@@ -334,15 +377,16 @@ public class PanelRoseView extends View {
         }
     }
 
-    public class PanelRoseEmptyDataProvider implements IChartData,Serializable {
-        float[][] floats={{4,1},{5,1},{6,1},{8,1}};
+    public class PanelRoseEmptyDataProvider implements IChartData, Serializable {
+        float[][] floats = {{4, 1}, {5, 1}, {6, 1}, {8, 1}};
+
         @Override
         public int getDateCount() {
             return floats.length;
         }
 
         @Override
-        public float getY(int indexX,int indexY) {
+        public float getY(int indexX, int indexY) {
             return floats[indexX][indexY];
         }
 
@@ -367,7 +411,7 @@ public class PanelRoseView extends View {
         }
     }
 
-    private class RoseHistroy{
+    private class RoseHistroy {
 
         public RoseHistroy(float startAngel, float endAngel, float radiaus) {
             this.startAngel = startAngel;
@@ -380,9 +424,9 @@ public class PanelRoseView extends View {
         float radiaus;
     }
 
-    private final  List<RoseHistroy> mHistroyList=new ArrayList<RoseHistroy>();
+    private final List<RoseHistroy> mHistroyList = new ArrayList<RoseHistroy>();
 
-    interface onRosePanelSelectedListener{
+    interface onRosePanelSelectedListener {
         void onRosePanelSelected(int index);
     }
 
