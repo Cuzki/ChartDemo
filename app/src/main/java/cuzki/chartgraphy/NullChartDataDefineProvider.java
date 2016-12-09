@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  * @author Cuzki
  */
-public class NullChartDataProvider implements IChartData,Serializable {
+public class NullChartDataDefineProvider implements IChartDataDefine,Serializable {
     @Override
     public int getDateCount() {
         return 0;

@@ -1,13 +1,16 @@
+/**
+ * Created on 2016/12/2
+ */
 package cuzki.chartgraphy;
 
 /**
- * Created by Administrator on 2016/12/7 0007.
+ * <p/>
+ *
+ * @author Cuzki
  */
-
-public class RoseData implements IChartData {
-    float[][]floats={{1,200},{0.8f,350},{0.6f,250},{0.4f,115},{0.2f,221}};
-    String[] stings={"2016.4","2016.2","2016.3的法师法师打发实得分","2016.4","2016.5000000000000000"};
-    String[] stingv={"200人","350人","250人","115人","221人"};
+public class ChartDataDefine2 implements IChartDataDefine {
+    float[][]floats={{30,200},{60,350},{27,650},{50,135},{90,251},{11,121},{80,352},{45,122},{64,200},{24,410},{44,180},{15,205}};
+    String[] stings={"2016.1","2016.2","2016.3","2016.4","2016.5","2016.6","2016.7","2016.8","2016.9","2016.10","2016.11","2016.12"};
     @Override
     public int getDateCount() {
         return floats.length;
@@ -28,7 +31,7 @@ public class RoseData implements IChartData {
 
     @Override
     public String getValueLabel(int indexX,int indexY) {
-        return ""+ getValue(indexX,indexY);
+        return getValue(indexX,indexY)+"";
     }
 
     @Override

@@ -8,9 +8,9 @@ package cuzki.chartgraphy;
  *
  * @author Cuzki
  */
-public class ChartData implements IChartData {
-    float[][] floats={{60,50,20},{32,10,150},{82,77,52},{20,14,50},{80,30,21},{50,44,232},{52,15,30},{72,21,10},{60,150,11},{60,151,89},{44,15,80},{45,60,10}};
-    String[] stings={"2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1"};
+public class ChartDataDefine1 implements IChartDataDefine {
+    float[][]floats={{20,80},{50,50},{60,40},{38,62},{70,30},{22,77},{55,45},{41,59},{20,80},{90,10},{11,89},{0,100}};
+    String[] stings={"100岁以上","90岁以上","80岁以上","60-50岁","50-40岁","40-30岁","30-25岁","25-22岁","22-20岁","20-18岁","18-17岁","17-15岁"};
     @Override
     public int getDateCount() {
         return floats.length;

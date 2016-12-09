@@ -29,7 +29,7 @@ import java.util.List;
  * @author Cuzki
  */
 public class PanelRoseView extends View {
-    IChartData mDataProvider;
+    IChartDataDefine mDataProvider;
 
     private float mCirX = -1;
     private float mCirY = -1;
@@ -90,10 +90,10 @@ public class PanelRoseView extends View {
         return this;
     }
 
-    public PanelRoseView setPanelRoseData(IChartData panelRoseData) {
+    public PanelRoseView setPanelRoseData(IChartDataDefine panelRoseData) {
         mDataProvider = panelRoseData;
         if (mDataProvider == null || mDataProvider.isEmpty()) {
-            mDataProvider = new PanelRoseEmptyDataProvider();
+            mDataProvider = new PanelRoseEmptyDataDefineProvider();
         }
         invalidate();
         return this;
@@ -142,7 +142,7 @@ public class PanelRoseView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (mDataProvider == null || mDataProvider.isEmpty()) {
-            mDataProvider = new PanelRoseEmptyDataProvider();
+            mDataProvider = new PanelRoseEmptyDataDefineProvider();
             mDrawEmpty=true;
         }else {
             mDrawEmpty=false;
@@ -400,7 +400,7 @@ public class PanelRoseView extends View {
         }
     }
 
-    public class PanelRoseEmptyDataProvider implements IChartData, Serializable {
+    public class PanelRoseEmptyDataDefineProvider implements IChartDataDefine, Serializable {
         float[][] floats = {{4, 1}, {5, 1}, {6, 1}, {8, 1}};
 
         @Override

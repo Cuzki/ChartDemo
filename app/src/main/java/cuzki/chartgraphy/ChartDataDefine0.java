@@ -8,7 +8,7 @@ package cuzki.chartgraphy;
  *
  * @author Cuzki
  */
-public class ChartData0 implements IChartData {
+public class ChartDataDefine0 implements IChartDataDefine {
     float[][] floats={{60},{150},{82},{50},{80},{232},{30},{72},{50},{89},{80},{10}};
     String[] stings={"2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1"};
     @Override
