@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -411,7 +413,7 @@ public class PanelRoseView extends View {
         }
     }
 
-    private class RoseHistroy {
+    private class RoseHistroy implements Parcelable{
 
         public RoseHistroy(float startAngel, float endAngel, float radiaus) {
             this.startAngel = startAngel;
@@ -422,6 +424,37 @@ public class PanelRoseView extends View {
         float startAngel;
         float endAngel;
         float radiaus;
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        public RoseHistroy(Parcel dest) {
+            dest.writeFloat(startAngel);
+            dest.writeFloat(endAngel);
+            dest.writeFloat(radiaus);
+        }
+
+
+        @Override
+        public void writeToParcel(Parcel parcel, int i) {
+            startAngel = parcel.readFloat();
+            endAngel = parcel.readFloat();
+            radiaus = parcel.readFloat();
+        }
+
+        public  Creator<RoseHistroy> CREATOR = new Creator<RoseHistroy>() {
+            @Override
+            public RoseHistroy createFromParcel(Parcel in) {
+                return new RoseHistroy(in);
+            }
+
+            @Override
+            public RoseHistroy[] newArray(int size) {
+                return new RoseHistroy[size];
+            }
+        };
     }
 
     private final List<RoseHistroy> mHistroyList = new ArrayList<RoseHistroy>();
