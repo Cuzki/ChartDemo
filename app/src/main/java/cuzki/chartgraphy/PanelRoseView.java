@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -41,6 +43,7 @@ public class PanelRoseView extends View {
 
     private boolean mDrawCenter = false;
     private boolean  mEnableSelected=false;
+    private boolean  mEnableRotate=false;
     private boolean  mDrawEmpty=false;
     private onRosePanelSelectedListener mSelectedListener;
 
@@ -48,7 +51,7 @@ public class PanelRoseView extends View {
     Paint paintLabel;
     Paint paintCenter;
     Paint paintValue;
-
+    XChartCalc xcalc;
     public PanelRoseView(Context context) {
         super(context);
         init();
@@ -97,8 +100,21 @@ public class PanelRoseView extends View {
         return this;
     }
 
+    Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            setStartDrawAngel(mDrawStartAngel+=2);
+            invalidate();
+        }
+    };
     public PanelRoseView setSelectedMode(boolean enableSelected){
         mEnableSelected=enableSelected;
+        return this;
+    }
+
+    public PanelRoseView setTouchMode(boolean enableRotate){
+        mEnableRotate=enableRotate;
         return this;
     }
 
@@ -111,16 +127,21 @@ public class PanelRoseView extends View {
     }
 
     public PanelRoseView setStartDrawAngel(float startDrawAngel){
+        handleDrawStartAngel(startDrawAngel);
+        return this;
+    }
+
+    private void handleDrawStartAngel(float startDrawAngel){
         mDrawStartAngel=startDrawAngel;
         while (mDrawStartAngel<0){
             mDrawStartAngel+=360;
         }
         mDrawStartAngel=mDrawStartAngel%360;
-        return this;
     }
 
 
     private void init() {
+        this.setClickable(true);
         paintArc = new Paint();
         paintLabel = new Paint();
         paintCenter = new Paint();
@@ -134,6 +155,8 @@ public class PanelRoseView extends View {
         paintCenter.setColor(Color.WHITE);
         paintCenter.setStyle(Paint.Style.FILL_AND_STROKE);
         paintValue.setTextSize(Utils.sp2px(getResources(), 10));
+        //位置计算类
+        xcalc = new XChartCalc();
     }
 
     @Override
@@ -145,7 +168,7 @@ public class PanelRoseView extends View {
         }else {
             mDrawEmpty=false;
         }
-        if (paintArc == null || paintLabel == null || paintCenter == null || paintValue == null) {
+        if (xcalc==null||paintArc == null || paintLabel == null || paintCenter == null || paintValue == null) {
             init();
         }
         mHistroyList.clear();
@@ -159,9 +182,6 @@ public class PanelRoseView extends View {
 
         float labelRadius = (float) (mRadius * 1.1);
         Resources res = getResources();
-
-        //位置计算类
-        XChartCalc xcalc = new XChartCalc();
 
         float currPer = mDrawStartAngel;
 
@@ -302,49 +322,72 @@ public class PanelRoseView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
         if(mEnableSelected&&!mDrawEmpty){
-            handleTouchEvent(x, y);
+            handleTouchEvent(event);
         }
         return super.onTouchEvent(event);
     }
 
-    private void handleTouchEvent(float x, float y) {
+    private float caculateAngel(float touchX,float touchY){
         // 将屏幕中的点转换成以屏幕中心为原点的坐标点
-        float mx = x - mCirX;
-        float my = y - mCirY;
-        float distance = mx * mx + my * my;
+        float mx = touchX - mCirX;
+        float my = touchY - mCirY;
         float piAngel = (float) Math.atan2((float) my, (float) mx);
         if (piAngel < 0) {
             piAngel = (float) (piAngel + Math.PI * 2);
         }
-        final float angel = (float) ((float) piAngel * 180 / Math.PI);//计算角度
+        return  (float) ((float) piAngel * 180 / Math.PI);
+    }
 
+    private void handleTouchEvent(MotionEvent event) {
         final int selectedIndex = mSelectedRoseIndex;
-//        Log.i("cxy","piAngel="+piAngel+"  angel="+angel+"-mx="+mx+"-  my="+my);
-        for (int i = 0; i < mHistroyList.size(); i++) {
-            RoseHistroy histroy = mHistroyList.get(i);
-            float startAngel = histroy.startAngel;
-            float endAngel = histroy.endAngel;
-            float radiaus = histroy.radiaus;
-            if ((angel >= startAngel && angel <= endAngel)||(angel +360>= startAngel && angel+360 <= endAngel)) {
-                if (distance >= (mCenterRadius * mCenterRadius) && distance <= (radiaus * radiaus)) {
-                    mSelectedRoseIndex = i;//记录并重新绘制选中的部分
-                } else {//外围部分，取消选中状态
-                    mSelectedRoseIndex = -1;
+        final float drawStartAngel=mDrawStartAngel;
+        Log.i("cxy","Action=" +event.getAction());
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                float posX = event.getX();
+                float posY = event.getY();
+                // 将屏幕中的点转换成以屏幕中心为原点的坐标点
+                float mx = posX - mCirX;
+                float my = posY - mCirY;
+                float distance = mx * mx + my * my;
+                mTouchDownAngel = caculateAngel(posX,posY);//计算角度
+                for (int i = 0; i < mHistroyList.size(); i++) {
+                    RoseHistroy histroy = mHistroyList.get(i);
+                    float startAngel = histroy.startAngel;
+                    float endAngel = histroy.endAngel;
+                    float radiaus = histroy.radiaus;
+                    if ((mTouchDownAngel >= startAngel && mTouchDownAngel <= endAngel)||(mTouchDownAngel +360>= startAngel && mTouchDownAngel+360 <= endAngel)) {
+                        if (distance >= (mCenterRadius * mCenterRadius) && distance <= (radiaus * radiaus)) {
+                            mSelectedRoseIndex = i;//记录并重新绘制选中的部分
+                        } else {//外围部分，取消选中状态
+                            mSelectedRoseIndex = -1;
+                        }
+                        break;
+                    }
                 }
                 break;
-            }
+            case MotionEvent.ACTION_MOVE:
+                if(mEnableRotate){
+                    float flipEndAngel=caculateAngel(event.getX(),event.getY());
+                    mDrawStartAngel+=(flipEndAngel-mTouchDownAngel);
+                    handleDrawStartAngel(mDrawStartAngel);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+
+                break;
         }
-        if (mSelectedRoseIndex != selectedIndex) {//有变化，需要重绘
-            Log.i("cxy", "选中 mSelectedRoseIndex=" + mSelectedRoseIndex);
+
+        if (mSelectedRoseIndex != selectedIndex||mDrawStartAngel!=drawStartAngel) {//有变化，需要重绘
             invalidate();
-            if (mSelectedListener != null) {
+            if (mSelectedRoseIndex != selectedIndex&&mSelectedListener != null) {
                 mSelectedListener.onRosePanelSelected(mSelectedRoseIndex);
             }
         }
     }
+
+    private float mTouchDownAngel ;
 
     public class XChartCalc {
         //Position位置

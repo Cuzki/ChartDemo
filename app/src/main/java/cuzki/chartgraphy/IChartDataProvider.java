@@ -45,7 +45,7 @@ public interface IChartDataProvider extends Serializable {
     String getValueLabel(int indexX,int indexY);
 
     /**
-     * 该数据是否为空或无效
+     * 该数据是否为空或无效,通常主要区分indexY
      * @return
      */
     boolean isEmpty();

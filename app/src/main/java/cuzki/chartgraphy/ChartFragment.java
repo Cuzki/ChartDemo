@@ -168,7 +168,7 @@ public class ChartFragment extends Fragment {
                 break;
             case 3://自定义南丁格尔玫瑰图（兼自定义饼图）
                 PanelRoseView panelRoseView = new PanelRoseView(getActivity());
-                panelRoseView.setDrawCenter(true).setSelectedMode(true).setDividerAngel(1).setStartDrawAngel(-90)
+                panelRoseView.setDrawCenter(true).setSelectedMode(true).setDividerAngel(1)
                         .setOnSelectedListener(new PanelRoseView.onRosePanelSelectedListener() {
                             @Override
                             public void onRosePanelSelected(int index) {
