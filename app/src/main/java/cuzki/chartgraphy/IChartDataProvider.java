@@ -10,7 +10,7 @@ import java.io.Serializable;
  *
  * @author Cuzki
  */
-public interface IChartDataDefine extends Serializable {
+public interface IChartDataProvider extends Serializable {
 
     /**
      * 获取横坐标数目

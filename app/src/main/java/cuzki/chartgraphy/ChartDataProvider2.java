@@ -1,5 +1,5 @@
 /**
- * Created on 2016/12/8
+ * Created on 2016/12/2
  */
 package cuzki.chartgraphy;
 
@@ -10,17 +10,12 @@ import android.graphics.Color;
  *
  * @author Cuzki
  */
-public class ChartDataDefine0 implements IChartDataDefine {
-    float[][] floats={{60},{150},{82},{50},{80},{232},{30},{72},{50},{89},{80},{10}};
-    String[] stings={"2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1"};
+public class ChartDataProvider2 implements IChartDataProvider {
+    float[][]floats={{30,200},{60,350},{27,650},{50,135},{90,251},{11,121},{80,352},{45,122},{64,200},{24,410},{44,180},{15,205}};
+    String[] stings={"2016.1","2016.2","2016.3","2016.4","2016.5","2016.6","2016.7","2016.8","2016.9","2016.10","2016.11","2016.12"};
     @Override
     public int getDateCount() {
         return floats.length;
-    }
-
-    @Override
-    public int getChildCount() {
-        return floats[0].length;
     }
 
     @Override
@@ -47,6 +42,11 @@ public class ChartDataDefine0 implements IChartDataDefine {
     }
 
     @Override
+    public int getChildCount() {
+        return floats[0].length;
+    }
+
+    @Override
     public int getChildColor(final int indexX,final int indexY) {
         int color=0;
         switch (indexY){
@@ -63,3 +63,4 @@ public class ChartDataDefine0 implements IChartDataDefine {
         return color;
     }
 }
+

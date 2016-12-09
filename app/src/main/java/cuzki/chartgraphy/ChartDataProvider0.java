@@ -1,18 +1,26 @@
+/**
+ * Created on 2016/12/8
+ */
 package cuzki.chartgraphy;
 
 import android.graphics.Color;
 
 /**
- * Created by Administrator on 2016/12/7 0007.
+ * <p/>
+ *
+ * @author Cuzki
  */
-
-public class RoseDataDefine implements IChartDataDefine {
-    float[][]floats={{1,200},{0.8f,350},{0.6f,250},{0.4f,115},{0.2f,221}};
-    String[] stings={"2016.4","2016.2","2016.3的法师法师打发实得分","2016.4","2016.5000000000000000"};
-    String[] stingv={"200人","350人","250人","115人","221人"};
+public class ChartDataProvider0 implements IChartDataProvider {
+    float[][] floats={{60},{150},{82},{50},{80},{232},{30},{72},{50},{89},{80},{10}};
+    String[] stings={"2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1"};
     @Override
     public int getDateCount() {
         return floats.length;
+    }
+
+    @Override
+    public int getChildCount() {
+        return floats[0].length;
     }
 
     @Override
@@ -30,17 +38,12 @@ public class RoseDataDefine implements IChartDataDefine {
 
     @Override
     public String getValueLabel(int indexX,int indexY) {
-        return ""+ getValue(indexX,indexY);
+        return getValue(indexX,indexY)+"";
     }
 
     @Override
     public boolean isEmpty() {
         return false;
-    }
-
-    @Override
-    public int getChildCount() {
-        return floats[0].length;
     }
 
     @Override
@@ -56,17 +59,7 @@ public class RoseDataDefine implements IChartDataDefine {
             case 2:
                 color= Color.parseColor("#33CCFF");
                 break;
-            case 3:
-                color= Color.parseColor("#FF3300");
-                break;
-            case 4:
-                color= Color.parseColor("#FF66FF");
-                break;
-            default:
-                color= Color.parseColor("#999999");
-                break;
         }
         return color;
     }
 }
-

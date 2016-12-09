@@ -1,49 +1,46 @@
 /**
- * Created on 2016/12/1
+ * Created on 2016/12/2
  */
 package cuzki.chartgraphy;
 
 import android.graphics.Color;
+
+import java.io.Serializable;
 
 /**
  * <p/>
  *
  * @author Cuzki
  */
-public class ChartDataDefine implements IChartDataDefine {
-    float[][] floats={{60,50,20},{32,10,150},{82,77,52},{20,14,50},{80,30,21},{50,44,232},{52,15,30},{72,21,10},{60,150,11},{60,151,89},{44,15,80},{45,60,10}};
-    String[] stings={"2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1"};
+public class NullChartDataProviderProvider implements IChartDataProvider,Serializable {
     @Override
     public int getDateCount() {
-        return floats.length;
-    }
-
-    @Override
-    public int getChildCount() {
-        return floats[0].length;
+        return 0;
     }
 
     @Override
     public float getValue(int indexX, int indexY) {
-        return floats[indexX][indexY];
+        return 0;
     }
 
     @Override
     public String getCoordinateLabel(int indexX) {
-        if(indexX>=stings.length||stings[indexX]==null){
-            return "";
-        }
-        return stings[indexX];
+        return "";
     }
 
     @Override
     public String getValueLabel(int indexX,int indexY) {
-        return floats[indexX][indexY]+"";
+        return getValue(indexX,indexY)+"";
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return true;
+    }
+
+    @Override
+    public int getChildCount() {
+        return 0;
     }
 
     @Override

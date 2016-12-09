@@ -53,7 +53,7 @@ public class ChartFragment extends Fragment {
     int mChartType;//区分图标类型
     int mServiceType;//区分业务类型
     View mChart;
-    private IChartDataDefine mData;
+    private IChartDataProvider mData;
     private String mChartName;
 
     private static final String ARG_CHART_TYPE = "ARG_CHART_TYPE";
@@ -250,9 +250,9 @@ public class ChartFragment extends Fragment {
         }
     }
 
-    private ComboLineColumnChartData generateComBineData(IChartDataDefine provider) {
+    private ComboLineColumnChartData generateComBineData(IChartDataProvider provider) {
         if (provider == null) {
-            provider = new NullChartDataDefineProvider();
+            provider = new NullChartDataProviderProvider();
         }
         //为了最优化显示，获取折线图最大值,折线图index 为0，柱状图为1
         float lineMax = 0;
@@ -292,9 +292,9 @@ public class ChartFragment extends Fragment {
         return data;
     }
 
-    private LineChartData generateLineData(IChartDataDefine linePrivider) {
+    private LineChartData generateLineData(IChartDataProvider linePrivider) {
         if (linePrivider == null) {
-            linePrivider = new NullChartDataDefineProvider();
+            linePrivider = new NullChartDataProviderProvider();
         }
         List<Line> lines = new ArrayList<Line>();
         List<PointValue> values = new ArrayList<PointValue>();
@@ -314,9 +314,9 @@ public class ChartFragment extends Fragment {
 
     }
 
-    private ColumnChartData generateColumnData(IChartDataDefine columeProvider, final float scale, final float sub) {
+    private ColumnChartData generateColumnData(IChartDataProvider columeProvider, final float scale, final float sub) {
         if (columeProvider == null) {
-            columeProvider = new NullChartDataDefineProvider();
+            columeProvider = new NullChartDataProviderProvider();
         }
         List<Column> columns = new ArrayList<>();
         List<SubcolumnValue> values;
@@ -329,9 +329,9 @@ public class ChartFragment extends Fragment {
         return columnChartData;
     }
 
-    private LineChartData generateLineChartData(IChartDataDefine providers) {
+    private LineChartData generateLineChartData(IChartDataProvider providers) {
         if (providers == null) {
-            providers = new NullChartDataDefineProvider();
+            providers = new NullChartDataProviderProvider();
         }
         List<Line> lines = new ArrayList<Line>();
         for (int j = 0; j < providers.getChildCount(); j++) {
@@ -375,9 +375,9 @@ public class ChartFragment extends Fragment {
         return ValueShape.CIRCLE;
     }
 
-    private ColumnChartData generateColumnChartData(IChartDataDefine provider) {
+    private ColumnChartData generateColumnChartData(IChartDataProvider provider) {
         if (provider == null) {
-            provider = new NullChartDataDefineProvider();
+            provider = new NullChartDataProviderProvider();
         }
         List<Column> columns = new ArrayList<Column>();
         List<SubcolumnValue> values;
@@ -405,9 +405,9 @@ public class ChartFragment extends Fragment {
     }
 
 
-    private PieChartData generatePieChartData(IChartDataDefine provider) {
+    private PieChartData generatePieChartData(IChartDataProvider provider) {
         if (provider == null) {
-            provider = new NullChartDataDefineProvider();
+            provider = new NullChartDataProviderProvider();
         }
 
         List<SliceValue> values = new ArrayList<SliceValue>();
@@ -451,19 +451,19 @@ public class ChartFragment extends Fragment {
             mData = null;
             switch (mChartType) {//造假数据
                 case 1://线形图
-                    mData = new ChartDataDefine();
+                    mData = new ChartDataProvider();
                     break;
                 case 2://柱状图
-                    mData = (mServiceType == ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_P_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_M_DISTRIBUTE) ? new ChartDataDefine1() : new ChartDataDefine0();
+                    mData = (mServiceType == ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_P_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_M_DISTRIBUTE) ? new ChartDataProvider1() : new ChartDataProvider0();
                     break;
                 case 3://南丁格尔玫瑰图
-                    mData = new RoseDataDefine();
+                    mData = new RoseDataProvider();
                     break;
                 case 4://折线柱状混合图
-                    mData = new ChartDataDefine2();
+                    mData = new ChartDataProvider2();
                     break;
                 case 5:
-                    mData = new ChartDataDefine1();
+                    mData = new ChartDataProvider1();
                     break;
             }
             setChartData();
@@ -524,8 +524,8 @@ public class ChartFragment extends Fragment {
             return;
         }
         Serializable serializable = savedInstanceState.getSerializable(KEY_DATA);
-        if (serializable != null && serializable instanceof IChartDataDefine) {
-            mData = (IChartDataDefine) savedInstanceState.getSerializable(KEY_DATA);
+        if (serializable != null && serializable instanceof IChartDataProvider) {
+            mData = (IChartDataProvider) savedInstanceState.getSerializable(KEY_DATA);
             Log.i("cxy", "fragment" + mChartType + "调用onCreate获取到存储信息:  " + mData.getChildCount() + "条数");
         }
     }
