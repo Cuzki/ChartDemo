@@ -351,14 +351,14 @@ public class PanelRoseView extends View {
                 float mx = posX - mCirX;
                 float my = posY - mCirY;
                 float distance = mx * mx + my * my;
-                mTouchDownAngel = caculateAngel(posX,posY);//计算角度
-                mFlipDownAngel=mTouchDownAngel;
+                float touchDownAngel = caculateAngel(posX,posY);//计算角度
+                mFlipDownAngel=touchDownAngel;
                 for (int i = 0; i < mHistroyList.size(); i++) {
                     RoseHistroy histroy = mHistroyList.get(i);
                     float startAngel = histroy.startAngel;
                     float endAngel = histroy.endAngel;
                     float radiaus = histroy.radiaus;
-                    if ((mTouchDownAngel >= startAngel && mTouchDownAngel <= endAngel)||(mTouchDownAngel +360>= startAngel && mTouchDownAngel+360 <= endAngel)) {
+                    if ((touchDownAngel >= startAngel && touchDownAngel <= endAngel)||(touchDownAngel +360>= startAngel && touchDownAngel+360 <= endAngel)) {
                         if (distance >= (mCenterRadius * mCenterRadius) && distance <= (radiaus * radiaus)) {
                             mSelectedRoseIndex = i;//记录并重新绘制选中的部分
                         } else {//外围部分，取消选中状态
@@ -389,7 +389,6 @@ public class PanelRoseView extends View {
         }
     }
 
-    private float mTouchDownAngel ;
     private float mFlipDownAngel ;
 
     public class XChartCalc {
