@@ -352,6 +352,7 @@ public class PanelRoseView extends View {
                 float my = posY - mCirY;
                 float distance = mx * mx + my * my;
                 mTouchDownAngel = caculateAngel(posX,posY);//计算角度
+                mFlipDownAngel=mTouchDownAngel;
                 for (int i = 0; i < mHistroyList.size(); i++) {
                     RoseHistroy histroy = mHistroyList.get(i);
                     float startAngel = histroy.startAngel;
@@ -370,12 +371,13 @@ public class PanelRoseView extends View {
             case MotionEvent.ACTION_MOVE:
                 if(mEnableRotate){
                     float flipEndAngel=caculateAngel(event.getX(),event.getY());
-                    mDrawStartAngel+=(flipEndAngel-mTouchDownAngel);
+                    mDrawStartAngel+=(flipEndAngel-mFlipDownAngel);
                     handleDrawStartAngel(mDrawStartAngel);
+                    mFlipDownAngel=flipEndAngel;
                 }
                 break;
             case MotionEvent.ACTION_UP:
-
+                mFlipDownAngel=0;
                 break;
         }
 
@@ -388,6 +390,7 @@ public class PanelRoseView extends View {
     }
 
     private float mTouchDownAngel ;
+    private float mFlipDownAngel ;
 
     public class XChartCalc {
         //Position位置
