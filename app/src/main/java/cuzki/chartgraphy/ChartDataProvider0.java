@@ -12,7 +12,7 @@ import android.graphics.Color;
  */
 public class ChartDataProvider0 implements IChartDataProvider {
     float[][] floats={{60},{150},{82},{50},{80},{232},{30},{72},{50},{89},{80},{10}};
-    String[] stings={"2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1","2016.1"};
+    String[] stings={"2016.1","2016.2","2016.3","2016.4","2016.5","2016.6","2016.7","2016.8","2016.9","2016.10","2016.11","2016.12"};
     @Override
     public int getDateCount() {
         return floats.length;
