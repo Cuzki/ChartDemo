@@ -105,8 +105,6 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         mHandler.sendEmptyMessageDelayed(1, 1500);
-        Log.i("cxys",
-                "onActivityResult ");
     }
 
     @Override
@@ -119,8 +117,6 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
     protected void onPause() {
         super.onPause();
         mOrientationListener.disable();
-        mIsAbleJump = false;
-
     }
 
     @Override
