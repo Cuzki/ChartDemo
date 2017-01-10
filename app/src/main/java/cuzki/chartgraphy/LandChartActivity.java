@@ -44,7 +44,7 @@ public class LandChartActivity extends FragmentActivity {
             mPageType=getIntent().getIntExtra(KEY_PAGE_TYPE,0);
         }
         setContentView(R.layout.cloudoffice_data_chart_activity);
-        getSupportFragmentManager().beginTransaction().add(R.id.fl_container,ViewPagerChartsFragment.newInstance(mPageType), "viewpage").commitAllowingStateLoss();
+        getSupportFragmentManager().beginTransaction().add(R.id.fl_container,ViewPagerChartsFragment.newInstance(mPageType,true), "viewpage").commitAllowingStateLoss();
         mOrientationListener = new OrientationEventListener(this,
                 SensorManager.SENSOR_DELAY_NORMAL) {
 

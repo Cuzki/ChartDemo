@@ -28,4 +28,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.github.lecho:hellocharts-library:1.5.7@aar'
     compile 'com.android.support:design:23.1.1'
+    compile 'org.quanqi:mpandroidchart:1.7.5'
 }

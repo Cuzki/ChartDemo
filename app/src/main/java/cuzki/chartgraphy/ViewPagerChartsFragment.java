@@ -13,9 +13,11 @@ import android.view.ViewGroup;
 
 public class ViewPagerChartsFragment extends Fragment {
     public static final String ARG_COMBINE_TYPE = "ARG_COMBINE_TYPE";
+    public static final String ARG_LAND_USED_TYPE = "ARG_LAND_USED_TYPE";
     private static final int TYPE_MEMBER_STATISTIC = 0;
     private static final int TYPE_CHANGE_ANALYZE =1;
     private int mServiceType;//区分业务类型
+    private boolean mIsLand=false;
 
     /**
      * 业务类型
@@ -50,9 +52,14 @@ public class ViewPagerChartsFragment extends Fragment {
 
 
     public static ViewPagerChartsFragment newInstance(int serviceType) {
+        return newInstance(serviceType,false);
+    }
+
+    public static ViewPagerChartsFragment newInstance(int serviceType,boolean isLandUsed) {
         ViewPagerChartsFragment fragment = new ViewPagerChartsFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COMBINE_TYPE, serviceType);
+        args.putBoolean(ARG_LAND_USED_TYPE, isLandUsed);
         fragment.setArguments(args);
         return fragment;
     }
@@ -62,6 +69,7 @@ public class ViewPagerChartsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_view_pager_charts,null);
         mServiceType=getArguments().getInt(ARG_COMBINE_TYPE,TYPE_MEMBER_STATISTIC);
+        mIsLand=getArguments().getBoolean(ARG_LAND_USED_TYPE,false);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
         mViewPager = (ViewPager) view.findViewById(R.id.pager);
         mNvChart= (NavigationView) view.findViewById(R.id.nv_chart);
@@ -123,12 +131,12 @@ public class ViewPagerChartsFragment extends Fragment {
             return "";
         }
 
-        public int getChartType(int position){// 1:线形图 2:柱状图 3:自定义南丁格尔玫瑰图（兼自定义饼图）4:折线柱状混合图
+        public int getChartType(int position){// 1:线形图 2:柱状图 3:自定义南丁格尔玫瑰图（兼自定义饼图）4:折线柱状混合图 5:水平柱状图
             int type=1;
             final boolean isMemberStatisticUse=(mServiceType==TYPE_MEMBER_STATISTIC);
             switch (position) {
                 case 0:
-                    type= (isMemberStatisticUse?2:1);
+                    type= (isMemberStatisticUse?(mIsLand?2:5):1);
                     break;
                 case 1:
                     type=(isMemberStatisticUse?3:3);

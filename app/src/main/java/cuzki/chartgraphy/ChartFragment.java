@@ -206,26 +206,12 @@ public class ChartFragment extends Fragment {
                 mRlChartContainer.addView(comboLineColumnChartView);
                 mChart = comboLineColumnChartView;
                 break;
-//            case 5://框架饼图
-//                PieChartView pieChartView = new PieChartView(getActivity());
-//                pieChartView.setCircleFillRatio(0.8f);
-//                pieChartView.setOnValueTouchListener(new PieChartOnValueSelectListener() {
-//                    @Override
-//                    public void onValueDeselected() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onValueSelected(int arcIndex, SliceValue value) {
-//
-//                    }
-//                });
-//                /** Note: Chart is within ViewPager so enable container scroll mode. **/
-//                pieChartView.setContainerScrollEnabled(true, ContainerScrollType.HORIZONTAL);
-//                pieChartView.setValueSelectionEnabled(true);
-//                mRlChartContainer.addView(pieChartView);
-//                mChart = pieChartView;
-//                break;
+            case 5://水平柱状图
+                HBarChartView landChart = new HBarChartView(getActivity());
+                /** Note: Chart is within ViewPager so enable container scroll mode. **/
+                mRlChartContainer.addView(landChart);
+                mChart = landChart;
+                break;
         }
         mTvTitle.setText(mChartName);
     }
@@ -462,7 +448,7 @@ public class ChartFragment extends Fragment {
                 case 4://折线柱状混合图
                     mData = new ChartDataProvider2();
                     break;
-                case 5:
+                case 5://水平柱状图
                     mData = new ChartDataProvider1();
                     break;
             }
@@ -488,14 +474,28 @@ public class ChartFragment extends Fragment {
                 ComboLineColumnChartView comboLineColumnChartView = (ComboLineColumnChartView) mChart;
                 comboLineColumnChartView.setComboLineColumnChartData(generateComBineData(mData));
                 break;
-//            case 5://hellochart 饼图
-//                PieChartView pieChartView = (PieChartView) mChart;
-//                pieChartView.setPieChartData(generatePieChartData(mData));
-//                break;
+            case 5://水平柱状图
+                HBarChartView hBarChartView = (HBarChartView) mChart;
+                hBarChartView.setBarData(mData);
+                break;
         }
         if (mChart instanceof AbstractChartView) {
             ((AbstractChartView) mChart).startDataAnimation();
         }
+    }
+
+    private List<HBarChartData> generateLandBarData(IChartDataProvider data) {
+        List<HBarChartData> list=new ArrayList<>();
+        if(data!=null){
+            for(int i=0;i<data.getDateCount();i++){
+                HBarChartData date=new HBarChartData();
+                date.setName(data.getCoordinateLabel(i));
+                date.setRecover_complete(data.getValue(i,0));
+                date.setRecover_uncomplete(data.getValue(i,1));
+                list.add(date);
+            }
+        }
+        return list;
     }
 
     @Override
