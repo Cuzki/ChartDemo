@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -83,7 +84,6 @@ public class HBarChartView  extends View {
         mBarRecorderList.clear();
         float width=getWidth()-getPaddingLeft()-getPaddingRight();
         float height=getHeight()-getPaddingTop()-getPaddingBottom();
-        float barWidth=width;
         float unitDistance=0;
         if(mDataProvider==null||mDataProvider.isEmpty()){
             return;//画空
@@ -110,6 +110,7 @@ public class HBarChartView  extends View {
         if(maxLabelWidth>width/8){//最大不超过宽度的1/8
             maxLabelWidth=width/8;
         }
+        float barWidth=width-maxLabelWidth;
         if(maxValue!=0){
             unitDistance=barWidth/maxValue;
         }else {
@@ -151,6 +152,7 @@ public class HBarChartView  extends View {
                 canvas.drawRect(bar,paintBar);
                 if(i==mSelectedXIndex&&j== mSelectedYIndex){
                     canvas.drawText(mDataProvider.getValueLabel(i,j), right-labelMarginRight, lineBarStartY-offset/2+(offset+barHeight)/2+(valueFmi.bottom-valueFmi.top)/2-valueFmi.bottom, paintValue);
+                         Log.i("tt", "--"+(right-labelMarginRight)+"--"+(lineBarStartY-offset/2+(offset+barHeight)/2+(valueFmi.bottom-valueFmi.top)/2-valueFmi.bottom));
                 }
                 startX+=+diatance;
             }
