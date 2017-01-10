@@ -79,7 +79,6 @@ public class HBarChartView  extends View {
         final int count=mDataProvider.getDateCount();
         float maxValue=0;
         float maxLabelWidth=0;
-        float lableHeight=0;
         for(int i=0;i<count;i++){
             float totleValue=0;
             for(int j=0;j<mDataProvider.getChildCount();j++){
@@ -90,9 +89,6 @@ public class HBarChartView  extends View {
             }
             int[] res=getTextWidth(mDataProvider.getCoordinateLabel(i));
             int labelWidth=res[0];
-            if(lableHeight==0){
-                lableHeight=res[1];
-            }
             if(maxLabelWidth<labelWidth){
                 maxLabelWidth=labelWidth;
             }
@@ -121,7 +117,7 @@ public class HBarChartView  extends View {
                 startX+=+diatance;
             }
             //画label
-            canvas.drawText(mDataProvider.getCoordinateLabel(i), lineBarStartX-labelMarginRight, lineBarStartY+barHeight/2+lableHeight/2-fmi.bottom, paintLabel);
+            canvas.drawText(mDataProvider.getCoordinateLabel(i), lineBarStartX-labelMarginRight, lineBarStartY+barHeight/2+(fmi.bottom-fmi.top)/2-fmi.bottom, paintLabel);
             lineBarStartY=(lineBarStartY+barHeight+offset);
         }
 
