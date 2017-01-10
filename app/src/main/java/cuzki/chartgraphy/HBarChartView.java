@@ -8,10 +8,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,6 +33,8 @@ public class HBarChartView  extends View {
 
     Paint paintLabel;
     Paint paintBar;
+    Paint paintCoor;
+    Paint paintValue;
 
     /**
      * 屏幕的宽
@@ -55,26 +60,33 @@ public class HBarChartView  extends View {
     private void init(){
         paintLabel = new Paint();
         paintBar = new Paint();
-
+        paintCoor=new Paint();
+        paintValue=new Paint();
         paintLabel.setAntiAlias(true);
         paintBar.setAntiAlias(true);
-
+        paintCoor.setAntiAlias(true);
+        paintCoor.setStyle(Paint.Style.STROKE);
         paintBar.setStyle(Paint.Style.FILL_AND_STROKE);
         paintLabel.setTextSize(Utils.sp2px(getResources(), 10));
+        paintValue.setTextSize(Utils.sp2px(getResources(), 10));
         paintLabel.setTextAlign(Paint.Align.RIGHT);
         paintLabel.setColor(Color.parseColor("#000000"));
+        paintValue.setTextAlign(Paint.Align.RIGHT);
+        paintValue.setColor(Color.parseColor("#ffffff"));
+        paintValue.setStrokeWidth(2);
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        mBarRecorderList.clear();
         float width=getWidth()-getPaddingLeft()-getPaddingRight();
         float height=getHeight()-getPaddingTop()-getPaddingBottom();
         float barWidth=width;
         float unitDistance=0;
         if(mDataProvider==null||mDataProvider.isEmpty()){
-            return;
+            return;//画空
         }
         final int count=mDataProvider.getDateCount();
         float maxValue=0;
@@ -100,31 +112,56 @@ public class HBarChartView  extends View {
         }
         if(maxValue!=0){
             unitDistance=barWidth/maxValue;
+        }else {
+            return;//画空
         }
         float offset=Utils.dp2px(getResources(),4);
         float barHeight=(height-offset*(count+1))/count;
         float lineBarStartX=maxLabelWidth;
         float lineBarStartY=offset;
-
-        Paint.FontMetricsInt fmi = paintLabel.getFontMetricsInt();
+        if(mIsDrawXCorordinate){
+            canvas.drawLine(lineBarStartX,0,lineBarStartX,height,paintCoor);
+        }
+        if(mIsDrawYCorordinate){
+            canvas.drawLine(lineBarStartX,height,width,height,paintCoor);
+        }
+        Paint.FontMetricsInt LabelFmi = paintLabel.getFontMetricsInt();
+        Paint.FontMetricsInt valueFmi = paintValue.getFontMetricsInt();
         for(int i=0;i<count;i++){
             //画bar
             float startX=lineBarStartX;
             for(int j=0;j<mDataProvider.getChildCount();j++){
-                paintBar.setColor(mDataProvider.getChildColor(i,j));
                 float diatance=mDataProvider.getValue(i,j)*unitDistance;
-                canvas.drawRect(startX,lineBarStartY,startX+diatance,lineBarStartY+barHeight,paintBar);
+                BarRecorder recorder=new BarRecorder();//记录该bar
+                recorder.indexY=j;
+                recorder.indexX=i;
+                float top=lineBarStartY;
+                float bottom=lineBarStartY+barHeight;
+                float right=startX+diatance;
+                float left=startX;
+                paintBar.setColor(mDataProvider.getChildColor(i,j));
+                if(i==mSelectedXIndex&&j== mSelectedYIndex){
+                    top-=offset/2;
+                    bottom+=offset/2;
+                    paintBar.setColor( Utils.darkenColor(mDataProvider.getChildColor(i,j)));
+                }
+                RectF bar=new RectF(left,top,right,bottom);
+                recorder.rectF=bar;
+                mBarRecorderList.add(recorder);
+                canvas.drawRect(bar,paintBar);
+                if(i==mSelectedXIndex&&j== mSelectedYIndex){
+                    canvas.drawText(mDataProvider.getValueLabel(i,j), right-labelMarginRight, lineBarStartY-offset/2+(offset+barHeight)/2+(valueFmi.bottom-valueFmi.top)/2-valueFmi.bottom, paintValue);
+                }
                 startX+=+diatance;
             }
-            //画label
-            canvas.drawText(mDataProvider.getCoordinateLabel(i), lineBarStartX-labelMarginRight, lineBarStartY+barHeight/2+(fmi.bottom-fmi.top)/2-fmi.bottom, paintLabel);
+            //画label x轴
+            canvas.drawText(mDataProvider.getCoordinateLabel(i), lineBarStartX-labelMarginRight, lineBarStartY+barHeight/2+(LabelFmi.bottom-LabelFmi.top)/2-LabelFmi.bottom, paintLabel);
             lineBarStartY=(lineBarStartY+barHeight+offset);
         }
-
     }
 
     /**
-     * 获取单个字符的高和宽
+     * 获取字符的高和宽
      */
     private int[] getTextWidth(String str) {
         int[] wh = new int[2];
@@ -142,28 +179,89 @@ public class HBarChartView  extends View {
 
 
 
-    public void setBarData(IChartDataProvider data) {
+    public HBarChartView setBarData(IChartDataProvider data) {
         mDataProvider=data;
         invalidate();
+        return this;
+    }
+
+    public HBarChartView setXCoordinateDrawable(boolean isDraw) {
+        mIsDrawXCorordinate=isDraw;
+        return this;
+    }
+
+    public HBarChartView setYCoordinateDrawable(boolean isDraw) {
+        mIsDrawYCorordinate=isDraw;
+        return this;
+    }
+
+    public HBarChartView setLabelTxtColor(int  color) {
+        if(paintLabel==null){
+            init();
+        }
+        paintLabel.setColor(color);
+        return this;
+    }
+
+    public HBarChartView setLabelTxtSize(float  size) {
+        if(paintLabel==null){
+            init();
+        }
+        paintLabel.setTextSize(size);
+        return this;
     }
 
 
     /**
-     * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
+     * 水平轴及坐标线是否绘制
      */
-    public static int dip2px(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
-
-
+    private boolean mIsDrawXCorordinate=true;
 
     /**
-     * 根据手机的分辨率从 px(像素) 的单位 转成为 dp
+     * 竖直坐标轴及坐标线是否绘制
      */
-    public static int px2dip(Context context, float pxValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (pxValue / scale + 0.5f);
+    private boolean mIsDrawYCorordinate=true;
+
+    private int mSelectedXIndex=-1;
+    private int mSelectedYIndex=-1;
+    private List<BarRecorder> mBarRecorderList=new ArrayList<>();
+    private boolean  mEnableSelected=true;
+    private boolean  mDrawEmpty=false;
+    class BarRecorder{
+        int indexX;
+        int indexY;
+        RectF rectF;
+        public boolean isSelected(float x,float y){
+            return rectF==null?false:rectF.contains(x,y);
+        }
+
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if(mEnableSelected&&!mDrawEmpty){
+            handleTouchEvent(event);
+        }
+        return super.onTouchEvent(event);
+    }
+
+    private void handleTouchEvent(MotionEvent event) {
+        float posX = event.getX();
+        float posY = event.getY();
+        boolean result=false;
+        for(BarRecorder recorder:mBarRecorderList){
+            if(recorder.isSelected(posX,posY)){
+                mSelectedXIndex=recorder.indexX;
+                mSelectedYIndex=recorder.indexY;
+                result=true;
+                break;
+            }
+        }
+        if(!result){
+            mSelectedXIndex=-1;
+            mSelectedYIndex=-1;
+        }
+        invalidate();
     }
 
 }

@@ -310,7 +310,7 @@ public class PanelRoseView extends View {
             float textWidth = textNum.right - textNum.left;
             float textBaseLineX = xcalc.getPosX() - textWidth / 2;
             float textBaseLineY = xcalc.getPosY();
-            paintValue.setColor(darkenColor(mDataProvider.getChildColor(1,mSelectedRoseIndex)));
+            paintValue.setColor(Utils.darkenColor(mDataProvider.getChildColor(1,mSelectedRoseIndex)));
             float offset = Utils.dp2px(res, 3);
             canvas.drawRect(new RectF(textBaseLineX - offset, textBaseLineY - offset / 2 + fmi.top, textBaseLineX + textWidth + offset, textBaseLineY + offset / 2 + fmi.bottom), paintValue);
             paintValue.setColor(Color.WHITE);
@@ -531,16 +531,6 @@ public class PanelRoseView extends View {
 
     interface onRosePanelSelectedListener {
         void onRosePanelSelected(int index);
-    }
-
-    public static int darkenColor(int color) {
-        float[] hsv = new float[3];
-        int alpha = Color.alpha(color);
-        Color.colorToHSV(color, hsv);
-        hsv[1] = Math.min(hsv[1] * DARKEN_SATURATION, 1.0f);
-        hsv[2] = hsv[2] * DARKEN_INTENSITY;
-        int tempColor = Color.HSVToColor(hsv);
-        return Color.argb(alpha, Color.red(tempColor), Color.green(tempColor), Color.blue(tempColor));
     }
 
     private static final float DARKEN_SATURATION = 1.1f;
