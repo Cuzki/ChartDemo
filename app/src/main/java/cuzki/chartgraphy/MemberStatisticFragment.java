@@ -27,6 +27,7 @@ public class MemberStatisticFragment extends Fragment {
     NavigationView mNvNewest;
     List<View> mListViews = new ArrayList<View>();
     StasticPageAdapter mPageAdapter;
+    ViewPagerChartsFragment mFragment;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -48,7 +49,7 @@ public class MemberStatisticFragment extends Fragment {
         datas.add(new StatisticData("总人数","70"));
         initStatisticCardData(datas);
 
-        getChildFragmentManager().beginTransaction().add(R.id.fl_container, ViewPagerChartsFragment.newInstance(0), "viewpage").commitAllowingStateLoss();
+        getChildFragmentManager().beginTransaction().add(R.id.fl_container, mFragment=ViewPagerChartsFragment.newInstance(0), "viewpage").commitAllowingStateLoss();
 
         mVpNewest.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -139,6 +140,11 @@ public class MemberStatisticFragment extends Fragment {
 
     }
 
-
+    public int getCurrentFramentIndex(){
+        if(mFragment==null){
+            return 0;
+        }
+        return mFragment.getCurrentFramentIndex();
+    }
 }
 

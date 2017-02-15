@@ -1,10 +1,7 @@
 package cuzki.chartgraphy;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.os.PersistableBundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -17,20 +14,7 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
 
     private TabLayout mTab;
     private int  mCurrentFragmentPosition=0;
-    boolean mIsAbleJump = true;
     Fragment mLandFragment;
-
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case 1:
-                    mIsAbleJump = true;
-                    break;
-            }
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +34,6 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
         mTab.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-
                 showFragment(tab.getPosition());
             }
 
@@ -74,15 +57,8 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mHandler.sendEmptyMessageDelayed(1, 1500);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
-//        mOrientationListener.enable();
     }
 
     @Override
@@ -125,7 +101,17 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
         super.onConfigurationChanged(newConfig);
         Log.i("land","onConfigurationChanged orientation="+(newConfig.orientation == 1?"竖屏":"横屏"));
         if(newConfig.orientation == 2){//land
-            getSupportFragmentManager().beginTransaction().add(R.id.landContainer,mLandFragment=ViewPagerChartsFragment.newInstance(mCurrentFragmentPosition,true), "viewpage").commitAllowingStateLoss();
+            int position=0;
+            final String showTag = mCurrentFragmentPosition==0 ? MemberStatisticFragment.class.getSimpleName() : MemberChangeAnalyzedFragment.class.getSimpleName();
+            Fragment showFragment = getSupportFragmentManager().findFragmentByTag(showTag);
+            if(showFragment!=null){
+                if(showFragment instanceof MemberStatisticFragment){
+                    position=((MemberStatisticFragment)showFragment).getCurrentFramentIndex();
+                }else{
+                    position=((MemberChangeAnalyzedFragment)showFragment).getCurrentFramentIndex();
+                }
+            }
+            getSupportFragmentManager().beginTransaction().add(R.id.landContainer,mLandFragment=ViewPagerChartsFragment.newInstance(mCurrentFragmentPosition,true,position), "viewpage").commitAllowingStateLoss();
         }else{
             if(mLandFragment!=null){
                 getSupportFragmentManager().beginTransaction().remove(mLandFragment).commitAllowingStateLoss();

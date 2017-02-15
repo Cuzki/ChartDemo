@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 public class ViewPagerChartsFragment extends Fragment {
     public static final String ARG_COMBINE_TYPE = "ARG_COMBINE_TYPE";
     public static final String ARG_LAND_USED_TYPE = "ARG_LAND_USED_TYPE";
+    public static final String ARG_CURRENT_POSITION = "ARG_CURRENT_POSITION";
     private static final int TYPE_MEMBER_STATISTIC = 0;
     private static final int TYPE_CHANGE_ANALYZE =1;
     private int mServiceType;//区分业务类型
@@ -51,16 +52,22 @@ public class ViewPagerChartsFragment extends Fragment {
     ViewPager mViewPager;
     NavigationView mNvChart;
 
+    private int mCurrentPosition;
 
     public static ViewPagerChartsFragment newInstance(int serviceType) {
         return newInstance(serviceType,false);
     }
 
     public static ViewPagerChartsFragment newInstance(int serviceType,boolean isLandUsed) {
+        return newInstance(serviceType,isLandUsed,0);
+    }
+
+    public static ViewPagerChartsFragment newInstance(int serviceType,boolean isLandUsed,int index) {
         ViewPagerChartsFragment fragment = new ViewPagerChartsFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_COMBINE_TYPE, serviceType);
         args.putBoolean(ARG_LAND_USED_TYPE, isLandUsed);
+        args.putInt(ARG_CURRENT_POSITION, index);
         fragment.setArguments(args);
         return fragment;
     }
@@ -71,6 +78,7 @@ public class ViewPagerChartsFragment extends Fragment {
         View view=inflater.inflate(R.layout.fragment_view_pager_charts,null);
         mServiceType=getArguments().getInt(ARG_COMBINE_TYPE,TYPE_MEMBER_STATISTIC);
         mIsLand=getArguments().getBoolean(ARG_LAND_USED_TYPE,false);
+        mCurrentPosition=getArguments().getInt(ARG_CURRENT_POSITION,0);
         mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
         mViewPager = (ViewPager) view.findViewById(R.id.pager);
         mNvChart= (NavigationView) view.findViewById(R.id.nv_chart);
@@ -79,9 +87,12 @@ public class ViewPagerChartsFragment extends Fragment {
             @Override
             public void onPageSelected(int position) {
                 mNvChart.setSelect(position);
+                mCurrentPosition=position;
             }
         });
         initChartNavigation();
+        mViewPager.setCurrentItem(mCurrentPosition);
+        mNvChart.setSelect(mCurrentPosition);
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -191,4 +202,7 @@ public class ViewPagerChartsFragment extends Fragment {
         }
     }
 
+    public int getCurrentFramentIndex(){
+        return mCurrentPosition;
+    }
 }

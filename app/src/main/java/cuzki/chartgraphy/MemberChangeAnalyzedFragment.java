@@ -19,6 +19,7 @@ public class MemberChangeAnalyzedFragment extends Fragment {
 
     DonutProgress mPromoteRateProgress;
     DonutProgress mLeaveRateProgress;
+    ViewPagerChartsFragment mFragment;
 
     @Nullable
     @Override
@@ -26,7 +27,14 @@ public class MemberChangeAnalyzedFragment extends Fragment {
         View view=inflater.inflate(R.layout.cloudoffice_change_analyze_fragment,null);
         mPromoteRateProgress= (DonutProgress) view.findViewById(R.id.donut_progress_promote);
         mLeaveRateProgress= (DonutProgress) view.findViewById(R.id.donut_progress_dimission);
-        getChildFragmentManager().beginTransaction().add(R.id.fl_container, ViewPagerChartsFragment.newInstance(1), "viewpage").commitAllowingStateLoss();
+        getChildFragmentManager().beginTransaction().add(R.id.fl_container, mFragment=ViewPagerChartsFragment.newInstance(1), "viewpage").commitAllowingStateLoss();
         return view;
+    }
+
+    public int getCurrentFramentIndex(){
+        if(mFragment==null){
+            return 0;
+        }
+        return mFragment.getCurrentFramentIndex();
     }
 }
