@@ -30,6 +30,7 @@
                 android:layout_height="match_parent"
                 custom:donut_progress="30"
                 app:donut_max="100"
+                app:donut_finished_color="@color/co_primary_color"
                 android:layout_margin="20dp"
                 android:layout_centerInParent="true"
                 />
@@ -72,7 +73,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:id="@+id/tv_promote_num_tip"
-                android:text="晋升人数"
+                android:text="@string/promote_count"
                 />
 
             <TextView
@@ -81,7 +82,8 @@
                 android:layout_centerHorizontal="true"
                 android:id="@+id/tv_promote_num"
                 android:layout_below="@+id/tv_promote_num_tip"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/co_primary_color"
                 android:text="120"
                 />
 
@@ -91,8 +93,8 @@
                 android:layout_centerHorizontal="true"
                 android:id="@+id/tv_dismission_num_tip"
                 android:layout_above="@+id/tv_dismission_num"
-                android:layout_marginBottom="10dp"
-                android:text="离职人数"
+                android:layout_marginBottom="5dp"
+                android:text="@string/leave_count"
                 />
             <TextView
                 android:layout_width="wrap_content"
@@ -100,6 +102,7 @@
                 android:layout_centerHorizontal="true"
                 android:id="@+id/tv_dismission_num"
                 android:layout_alignParentBottom="true"
+                android:textColor="@color/co_leave_rate_txt_color"
                 android:text="120"
                 />
 
@@ -117,6 +120,7 @@
                 custom:donut_progress="30"
                 android:layout_margin="20dp"
                 android:layout_centerInParent="true"
+                app:donut_finished_color="@color/co_leave_rate_txt_color"
                 app:donut_max="100"
                 />
             <LinearLayout

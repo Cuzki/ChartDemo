@@ -24,6 +24,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/tab_fragment_title">
+    </FrameLayout>
 
+    <FrameLayout
+        android:id="@+id/landContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
     </FrameLayout>
 </RelativeLayout>

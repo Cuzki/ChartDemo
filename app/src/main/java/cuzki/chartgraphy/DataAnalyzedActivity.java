@@ -1,25 +1,25 @@
 package cuzki.chartgraphy;
 
 import android.content.Intent;
-import android.hardware.SensorManager;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PersistableBundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
-import android.view.OrientationEventListener;
 import android.view.View;
 
 public class DataAnalyzedActivity extends FragmentActivity implements View.OnClickListener {
 
-
-    OrientationEventListener mOrientationListener;//重力感应器
     private TabLayout mTab;
     private int  mCurrentFragmentPosition=0;
     boolean mIsAbleJump = true;
+    Fragment mLandFragment;
+
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -35,40 +35,11 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i("land","onCreate orientation");
+        Log.i("info","portrait"); // 竖屏
         setContentView(R.layout.cloudoffice_data_analyze_activity);
         initView();
         initEvent();
-
-        mOrientationListener = new OrientationEventListener(this,
-                SensorManager.SENSOR_DELAY_NORMAL) {
-
-            @Override
-            public void onOrientationChanged(int orientation) {
-                if (orientation == OrientationEventListener.ORIENTATION_UNKNOWN) {
-                    return;  //手机平放时，检测不到有效的角度
-                }
-                orientation = orientation % 360;
-                if (orientation > 350 || orientation < 10) { //0度
-                    orientation = 0;
-                } else if (orientation > 80 && orientation < 100) { //90度
-                    orientation = 90;
-                } else if (orientation > 170 && orientation < 190) { //180度
-                    orientation = 180;
-                } else if (orientation > 260 && orientation < 280) { //270度
-                    orientation = 270;
-                } else {
-                    return;
-                }
-                Log.i("cxys",
-                        "Orientation changed to " + orientation + "  " + mIsAbleJump);
-                if ((orientation == 270 || orientation == 90) && mIsAbleJump) {
-                    mIsAbleJump = false;
-                    Intent intent=new Intent(DataAnalyzedActivity.this,LandChartActivity.class);
-                    intent.putExtra(LandChartActivity.KEY_PAGE_TYPE,mCurrentFragmentPosition);
-                    DataAnalyzedActivity.this.startActivityForResult(intent, 10);
-                }
-            }
-        };
 
     }
 
@@ -79,6 +50,7 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
         mTab.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+
                 showFragment(tab.getPosition());
             }
 
@@ -110,19 +82,17 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
     @Override
     protected void onResume() {
         super.onResume();
-        mOrientationListener.enable();
+//        mOrientationListener.enable();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mOrientationListener.disable();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mOrientationListener.disable();
     }
 
     private void showFragment(final int index) {
@@ -150,4 +120,26 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
     public void onClick(View view) {
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.i("land","onConfigurationChanged orientation="+(newConfig.orientation == 1?"竖屏":"横屏"));
+        if(newConfig.orientation == 2){//land
+            getSupportFragmentManager().beginTransaction().add(R.id.landContainer,mLandFragment=ViewPagerChartsFragment.newInstance(mCurrentFragmentPosition,true), "viewpage").commitAllowingStateLoss();
+        }else{
+            if(mLandFragment!=null){
+                getSupportFragmentManager().beginTransaction().remove(mLandFragment).commitAllowingStateLoss();
+            }
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
 }
