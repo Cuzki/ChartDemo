@@ -1,6 +1,8 @@
 package cuzki.chartgraphy;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -38,6 +40,14 @@ public class ViewPagerChartsFragment extends Fragment {
     public static final int SERVER_CURRENT_PROMOTE_DISTRIBUTE=12;//近3年晋升趋势分析
 
 
+    private Handler mHandler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            mViewPager.setCurrentItem(mCurrentPosition);
+            mNvChart.setSelect(mCurrentPosition);
+        }
+    };
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide fragments for each of the sections. We use a
@@ -91,8 +101,9 @@ public class ViewPagerChartsFragment extends Fragment {
             }
         });
         initChartNavigation();
-        mViewPager.setCurrentItem(mCurrentPosition);
-        mNvChart.setSelect(mCurrentPosition);
+        if(mCurrentPosition>0){
+            mHandler.sendEmptyMessageDelayed(0,500);
+        }
         view.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
