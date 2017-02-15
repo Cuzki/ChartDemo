@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <color name="colorPrimary">#00FFFF</color>
     <color name="colorPrimaryDark">#FF7F50</color>
     <color name="colorAccent">#6495ED</color>
@@ -25,4 +26,12 @@
     <color name="text_line_chart">#FF0000</color>
     <color name="line_chart_complete">#CC33CC</color>
     <color name="line_chart_uncomplete">#999999</color>
+
+    <color name="co_primary_color">#2897e4</color>
+    <color name="co_tab_txt_color">#000000</color>
+    <color name="co_tab_bg_color">#f3f4f8</color>
+    <color name="co_nav_bg_color">#cccccc</color>
+    <color name="co_leave_rate_txt_color">#f6a455</color>
+
+
 </resources>

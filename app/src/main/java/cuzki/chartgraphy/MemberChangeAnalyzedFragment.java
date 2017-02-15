@@ -17,11 +17,15 @@ import android.view.ViewGroup;
  */
 public class MemberChangeAnalyzedFragment extends Fragment {
 
+    DonutProgress mPromoteRateProgress;
+    DonutProgress mLeaveRateProgress;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.cloudoffice_change_analyze_fragment,null);
-
+        mPromoteRateProgress= (DonutProgress) view.findViewById(R.id.donut_progress_promote);
+        mLeaveRateProgress= (DonutProgress) view.findViewById(R.id.donut_progress_dimission);
         getChildFragmentManager().beginTransaction().add(R.id.fl_container, ViewPagerChartsFragment.newInstance(1), "viewpage").commitAllowingStateLoss();
         return view;
     }

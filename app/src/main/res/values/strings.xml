@@ -5,5 +5,8 @@
     <string name="member_statistic">员工统计</string>
     <string name="member_change_analyze">异动分析</string>
     <string name="chart_show">图表展示</string>
-    <string name="newest_statistic">图表展示</string>
+    <string name="newest_statistic">最新统计</string>
+
+    <string name="promote_rate">晋升率</string>
+    <string name="leave_rate">离职率</string>
 </resources>

@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/tv_stastic_time"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
         android:gravity="center"
         android:text="统计2016-01-01-2016-08-31" />
 
@@ -22,19 +22,42 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            >
             <cuzki.chartgraphy.DonutProgress
                 android:id="@+id/donut_progress_promote"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
-                android:layout_marginBottom="10dp"
                 custom:donut_progress="30"
                 app:donut_max="100"
+                android:layout_margin="20dp"
+                android:layout_centerInParent="true"
                 />
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_centerInParent="true"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/promote_rate"
+                    android:gravity="center"
+                    android:layout_marginBottom="5dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="90%"
+                    android:id="@+id/tv_promate_rate"
+                    android:textColor="@color/co_primary_color"
+                    android:gravity="center"
+                    />
+            </LinearLayout>
         </RelativeLayout>
 
         <RelativeLayout
@@ -86,18 +109,40 @@
         <RelativeLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
             android:layout_weight="1">
             <cuzki.chartgraphy.DonutProgress
                 android:id="@+id/donut_progress_dimission"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 custom:donut_progress="30"
-                android:layout_marginLeft="15dp"
-                android:layout_marginRight="15dp"
-                android:layout_marginBottom="10dp"
+                android:layout_margin="20dp"
+                android:layout_centerInParent="true"
                 app:donut_max="100"
                 />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_centerInParent="true"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/leave_rate"
+                    android:gravity="center"
+                    android:layout_marginBottom="5dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="90%"
+                    android:id="@+id/tv_leave_rate"
+                    android:gravity="center"
+                    android:textColor="@color/co_leave_rate_txt_color"
+                    />
+            </LinearLayout>
 
         </RelativeLayout>
 

@@ -9,7 +9,6 @@ import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.TextPaint;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -91,7 +90,9 @@ public class DonutProgress extends View {
         finishedPaint.setColor(finishedStrokeColor);
         finishedPaint.setStyle(Paint.Style.STROKE);
         finishedPaint.setAntiAlias(true);
+        finishedPaint.setDither(true);//设置抖动
         finishedPaint.setStrokeWidth(finishedStrokeWidth);
+        finishedPaint.setStrokeCap(Paint.Cap.ROUND);
 
         unfinishedPaint = new Paint();
         unfinishedPaint.setColor(unfinishedStrokeColor);
@@ -269,14 +270,14 @@ public class DonutProgress extends View {
         }
         float innerCircleRadius = (getWidth() - Math.min(finishedStrokeWidth, unfinishedStrokeWidth) + Math.abs(finishedStrokeWidth - unfinishedStrokeWidth)) / 2f;
         canvas.drawCircle(getWidth() / 2.0f, getHeight() / 2.0f, innerCircleRadius, innerCirclePaint);
-        canvas.drawArc(finishedOuterRect, -90, getProgressAngle(), false, finishedPaint);
         canvas.drawArc(unfinishedOuterRect, getProgressAngle()-90, 360 - getProgressAngle(), false, unfinishedPaint);
+        canvas.drawArc(finishedOuterRect, -90, getProgressAngle(), false, finishedPaint);
 
-        String text = prefixText + progress + suffixText;
-        if (!TextUtils.isEmpty(text)) {
-            float textHeight = textPaint.descent() + textPaint.ascent();
-            canvas.drawText(text, (getWidth() - textPaint.measureText(text)) / 2.0f, (getWidth() - textHeight) / 2.0f, textPaint);
-        }
+//        String text = prefixText + progress + suffixText;
+//        if (!TextUtils.isEmpty(text)) {
+//            float textHeight = textPaint.descent() + textPaint.ascent();
+//            canvas.drawText(text, (getWidth() - textPaint.measureText(text)) / 2.0f, (getWidth() - textHeight) / 2.0f, textPaint);
+//        }
     }
 
     @Override

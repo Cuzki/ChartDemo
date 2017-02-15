@@ -12,10 +12,11 @@
         android:id="@+id/tab_fragment_title"
         android:layout_width="match_parent"
         android:layout_height="38dp"
-        android:background="@color/tab_color"
-        app:tabIndicatorColor="@color/tab_indictor_color"
-        app:tabSelectedTextColor="@color/tab_selected_color"
-        app:tabTextColor="@android:color/white"
+        android:background="@android:color/white"
+        app:tabIndicatorColor="@color/co_primary_color"
+        app:tabSelectedTextColor="@color/co_primary_color"
+        app:tabIndicatorHeight="1dp"
+        app:tabTextColor="@color/co_tab_txt_color"
         />
 
     <FrameLayout

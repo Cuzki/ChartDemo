@@ -328,6 +328,7 @@ public class ChartFragment extends Fragment {
             Line line = new Line(values);
             line.setColor(providers.getChildColor(0,j));
             line.setFilled(true);
+            line.setCubic(true);
             line.setShape(getShape(j));
             line.setStrokeWidth(1).setHasLabelsOnlyForSelected(true);
             lines.add(line);
@@ -340,7 +341,7 @@ public class ChartFragment extends Fragment {
             axvalues.add(v);
         }
 
-        data.setAxisXBottom(new Axis().setValues(axvalues).setHasLines(true).setTextColor(ChartUtils.COLOR_ORANGE).setFormatter(new SimpleAxisValueFormatter().setAppendedText("月".toCharArray())).setHasTiltedLabels(true));
+        data.setAxisXBottom(new Axis().setValues(axvalues).setTextColor(ChartUtils.COLOR_ORANGE).setFormatter(new SimpleAxisValueFormatter().setAppendedText("月".toCharArray())).setHasTiltedLabels(true));
         data.setAxisYLeft(new Axis().setHasLines(true));
         data.setBaseValue(Float.NEGATIVE_INFINITY);
         return data;
