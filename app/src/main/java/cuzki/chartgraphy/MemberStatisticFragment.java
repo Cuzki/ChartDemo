@@ -146,5 +146,12 @@ public class MemberStatisticFragment extends Fragment {
         }
         return mFragment.getCurrentFramentIndex();
     }
+
+    public void setViewPageIndex(int index){
+        if(mFragment==null){
+            return ;
+        }
+        mFragment.setViewPageIndex(index);
+    }
 }
 

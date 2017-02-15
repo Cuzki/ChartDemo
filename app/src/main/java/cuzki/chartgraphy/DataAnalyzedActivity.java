@@ -14,7 +14,7 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
 
     private TabLayout mTab;
     private int  mCurrentFragmentPosition=0;
-    Fragment mLandFragment;
+    ViewPagerChartsFragment mLandFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +114,9 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
             getSupportFragmentManager().beginTransaction().add(R.id.landContainer,mLandFragment=ViewPagerChartsFragment.newInstance(mCurrentFragmentPosition,true,position), "viewpage").commitAllowingStateLoss();
         }else{
             if(mLandFragment!=null){
+                int position=mLandFragment.getCurrentFramentIndex();
                 getSupportFragmentManager().beginTransaction().remove(mLandFragment).commitAllowingStateLoss();
+                setCurrentViewPagePosition(position);
             }
         }
     }
@@ -127,5 +129,17 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    public void setCurrentViewPagePosition(int currentFragmentPosition) {
+        final String showTag = mCurrentFragmentPosition==0 ? MemberStatisticFragment.class.getSimpleName() : MemberChangeAnalyzedFragment.class.getSimpleName();
+        Fragment showFragment = getSupportFragmentManager().findFragmentByTag(showTag);
+        if(showFragment!=null){
+            if(showFragment instanceof MemberStatisticFragment){
+                ((MemberStatisticFragment)showFragment).setViewPageIndex(currentFragmentPosition);
+            }else{
+                ((MemberChangeAnalyzedFragment)showFragment).setViewPageIndex(currentFragmentPosition);
+            }
+        }
     }
 }

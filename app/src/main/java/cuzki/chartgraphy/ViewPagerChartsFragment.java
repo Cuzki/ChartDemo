@@ -216,4 +216,9 @@ public class ViewPagerChartsFragment extends Fragment {
     public int getCurrentFramentIndex(){
         return mCurrentPosition;
     }
+
+    public void setViewPageIndex(int index){
+        mViewPager.setCurrentItem(index);
+        mNvChart.setSelect(index);
+    }
 }
