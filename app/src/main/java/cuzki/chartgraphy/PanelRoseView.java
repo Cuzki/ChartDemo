@@ -14,6 +14,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -48,7 +51,7 @@ public class PanelRoseView extends View {
     private onRosePanelSelectedListener mSelectedListener;
 
     Paint paintArc;
-    Paint paintLabel;
+    TextPaint paintLabel;
     Paint paintCenter;
     Paint paintValue;
     XChartCalc xcalc;
@@ -143,7 +146,7 @@ public class PanelRoseView extends View {
     private void init() {
         this.setClickable(true);
         paintArc = new Paint();
-        paintLabel = new Paint();
+        paintLabel = new TextPaint();
         paintCenter = new Paint();
         paintValue = new Paint();
 
@@ -268,13 +271,22 @@ public class PanelRoseView extends View {
             float lineEndX2 = isRight ? lineEndX1 + distance : lineEndX1 - distance;
             canvas.drawLine(lineStartX2, lineStartY2, lineEndX2, lineEndY2, paintLabel);//水平线
 
-            Rect textbounds = new Rect();
-            paintLabel.getTextBounds(mDataProvider.getCoordinateLabel(i), 0, mDataProvider.getCoordinateLabel(i).length(), textbounds);
-            //画标识文本
+//            Rect textbounds = new Rect();
+//            paintLabel.getTextBounds(mDataProvider.getCoordinateLabel(i), 0, mDataProvider.getCoordinateLabel(i).length(), textbounds);
 
+            //画标识文本
             float margin = Utils.dp2px(res, 1.5f);
-            Paint.FontMetricsInt fmi = paintLabel.getFontMetricsInt();
-            canvas.drawText(mDataProvider.getCoordinateLabel(i), isRight ? lineEndX2 + margin : lineEndX2 - textbounds.right - textbounds.left - margin, lineEndY2 + (fmi.bottom - textbounds.top) / 2 - fmi.bottom, paintLabel);
+
+            canvas.save();
+//            new StaticLayout(Html.fromHtml("<font color=\"#ff0000\">P岗</font><br>（50%）"),paintLabel,100, Layout.Alignment.ALIGN_CENTER,1.0F,0.0F,true);
+            StaticLayout layout = new StaticLayout(mDataProvider.getCoordinateLabel(i),paintLabel,100, Layout.Alignment.ALIGN_CENTER,1.0F,0.0F,true);
+            canvas.translate(isRight ? lineEndX2 + margin : lineEndX2 -layout.getWidth() - margin,lineEndY2-layout.getHeight()/2);
+            layout.draw(canvas);
+            canvas.restore();
+
+
+//            Paint.FontMetricsInt fmi = paintLabel.getFontMetricsInt();
+//            canvas.drawText("P岗位\n（60%）", isRight ? lineEndX2 + margin : lineEndX2 - textbounds.right - textbounds.left - margin, lineEndY2 + (fmi.bottom - textbounds.top) / 2 - fmi.bottom, paintLabel);
             //下次的起始角度
             currPer += percentage;
         }
@@ -316,7 +328,6 @@ public class PanelRoseView extends View {
             paintValue.setColor(Color.WHITE);
             canvas.drawText(valueLabelString, textBaseLineX, textBaseLineY, paintValue);
         }
-
     }
 
 

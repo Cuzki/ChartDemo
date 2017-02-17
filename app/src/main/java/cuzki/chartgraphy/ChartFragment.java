@@ -103,7 +103,6 @@ public class ChartFragment extends Fragment {
         mChartType = getArguments().getInt(ARG_CHART_TYPE);
         mServiceType = getArguments().getInt(ARG_SERVICE_TYPE);
         mChartName = getArguments().getString(ARG_CHART_NAME_TYPE);
-        Log.i("cxy", "调用onCreateView chart= " + mChartType);
         addChart();
         setService();
         mIsViewCreated = true;
