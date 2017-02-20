@@ -44,7 +44,7 @@ public class ViewPagerChartsFragment extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            mViewPager.setCurrentItem(mCurrentPosition);
+            mViewPager.setCurrentItem(mCurrentPosition,false);
             mNvChart.setSelect(mCurrentPosition);
         }
     };
@@ -218,7 +218,7 @@ public class ViewPagerChartsFragment extends Fragment {
     }
 
     public void setViewPageIndex(int index){
-        mViewPager.setCurrentItem(index);
+        mViewPager.setCurrentItem(index,false);
         mNvChart.setSelect(index);
     }
 }

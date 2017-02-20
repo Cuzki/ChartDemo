@@ -104,19 +104,19 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
             int position=0;
             final String showTag = mCurrentFragmentPosition==0 ? MemberStatisticFragment.class.getSimpleName() : MemberChangeAnalyzedFragment.class.getSimpleName();
             Fragment showFragment = getSupportFragmentManager().findFragmentByTag(showTag);
-//            if(showFragment!=null){
-//                if(showFragment instanceof MemberStatisticFragment){
-//                    position=((MemberStatisticFragment)showFragment).getCurrentFramentIndex();
-//                }else{
-//                    position=((MemberChangeAnalyzedFragment)showFragment).getCurrentFramentIndex();
-//                }
-//            }
+            if(showFragment!=null){
+                if(showFragment instanceof MemberStatisticFragment){
+                    position=((MemberStatisticFragment)showFragment).getCurrentFramentIndex();
+                }else{
+                    position=((MemberChangeAnalyzedFragment)showFragment).getCurrentFramentIndex();
+                }
+            }
             getSupportFragmentManager().beginTransaction().add(R.id.landContainer,mLandFragment=ViewPagerChartsFragment.newInstance(mCurrentFragmentPosition,true,position), "viewpage").commitAllowingStateLoss();
         }else{
             if(mLandFragment!=null){
-//                int position=mLandFragment.getCurrentFramentIndex();
-//                getSupportFragmentManager().beginTransaction().remove(mLandFragment).commitAllowingStateLoss();
-//                setCurrentViewPagePosition(position);
+                int position=mLandFragment.getCurrentFramentIndex();
+                getSupportFragmentManager().beginTransaction().remove(mLandFragment).commitAllowingStateLoss();
+                setCurrentViewPagePosition(position);
             }
         }
     }
