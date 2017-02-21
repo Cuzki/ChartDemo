@@ -120,16 +120,21 @@ public class MemberStatisticFragment extends Fragment {
                 View view=null;
                 if(i==start){
                     view= root.findViewById(R.id.content_one);
+                    view.setBackground(getActivity().getResources().getDrawable(R.drawable.bg_gradient_purple));
                 }
                 if(i==start+1){
                     view= root.findViewById(R.id.content_two);
+                    view.setBackground(getActivity().getResources().getDrawable(R.drawable.bg_gradient_ching));
                 }
                 if(i==start+2){
                     view= root.findViewById(R.id.content_three);
+                    view.setBackground(getActivity().getResources().getDrawable(R.drawable.bg_gradient_pink));
                 }
                 if(i==start+3){
                     view= root.findViewById(R.id.content_four);
+                    view.setBackground(getActivity().getResources().getDrawable(R.drawable.bg_gradient_orange));
                 }
+
                 TextView count= (TextView) view.findViewById(R.id.tv_count);
                 TextView title= (TextView) view.findViewById(R.id.tv_title);
                 count.setText(mData.get(i).count+"");

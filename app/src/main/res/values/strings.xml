@@ -11,6 +11,6 @@
     <string name="leave_rate">离职率</string>
 
     <string name="promote_count">晋升人数</string>
-    <string name="leave_count">离职人数</string>Html.fromHtml(""
+    <string name="leave_count">离职人数</string>
 
 </resources>

@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.Html;
 import android.text.Layout;
 import android.text.StaticLayout;
 import android.text.TextPaint;
@@ -44,6 +45,11 @@ public class PanelRoseView extends View {
     private float mDividerAngel=0;
     private float mDrawStartAngel=0;
 
+    public void setLabelTxtSize(float labelTxtSize) {
+        this.mLabelTxtSize = labelTxtSize;
+    }
+
+    private float mLabelTxtSize;
     private boolean mDrawCenter = false;
     private boolean  mEnableSelected=false;
     private boolean  mEnableRotate=false;
@@ -55,6 +61,8 @@ public class PanelRoseView extends View {
     Paint paintCenter;
     Paint paintValue;
     XChartCalc xcalc;
+
+
     public PanelRoseView(Context context) {
         super(context);
         init();
@@ -145,12 +153,14 @@ public class PanelRoseView extends View {
 
     private void init() {
         this.setClickable(true);
+        mLabelTxtSize=Utils.sp2px(getResources(),15);
         paintArc = new Paint();
         paintLabel = new TextPaint();
         paintCenter = new Paint();
         paintValue = new Paint();
 
         paintLabel.setAntiAlias(true);
+        paintLabel.setStyle(Paint.Style.FILL);
         paintArc.setAntiAlias(true);
         paintValue.setAntiAlias(true);
         paintCenter.setAntiAlias(true);
@@ -218,7 +228,7 @@ public class PanelRoseView extends View {
             if (mDataProvider.getValue(i, 1) <= 0 || mDataProvider.getValue(i, 0) <= 0) {
                 continue;
             }
-            int color = emptyColor == -1 ? mDataProvider.getChildColor(1,i) : emptyColor;
+            int color = emptyColor == -1 ? mDataProvider.getChildColor(i,0) : emptyColor;
             float thisRadius = baseRaidus * mDataProvider.getValue(i, 0) / maxRadia;
             float newarcLeft = mCirX - thisRadius;
             float newarcTop = mCirY - thisRadius;
@@ -248,8 +258,8 @@ public class PanelRoseView extends View {
                 continue;
             }
             paintLabel.setColor(color);
-            paintLabel.setStrokeWidth(Utils.sp2px(res, mSelectedRoseIndex == i ? 1 : 0.5f));
-            paintLabel.setTextSize(Utils.sp2px(res, mSelectedRoseIndex == i ? 12 : 8));
+            paintLabel.setStrokeWidth(Utils.sp2px(res, mSelectedRoseIndex == i ? Utils.dp2px(res, 1.0f) : Utils.dp2px(res, 0.5f)));
+            paintLabel.setTextSize(Utils.sp2px(res, mSelectedRoseIndex == i ? Utils.sp2px(res, 6) : Utils.sp2px(res, 4)));
             //计算百分比标签
             float lineAngel = currPer + (drawAngel) / 2;
 
@@ -270,30 +280,30 @@ public class PanelRoseView extends View {
             float distance = Utils.dp2px(res, 10);
             float lineEndX2 = isRight ? lineEndX1 + distance : lineEndX1 - distance;
             canvas.drawLine(lineStartX2, lineStartY2, lineEndX2, lineEndY2, paintLabel);//水平线
+            paintLabel.setStyle(Paint.Style.FILL);
+            canvas.drawCircle(lineEndX2, lineEndY2, Utils.dp2px(res, 3.0f), paintLabel);// 小圆
+
+            //画标识文本
+            float margin = Utils.dp2px(res, 8.0f);
 
 //            Rect textbounds = new Rect();
 //            paintLabel.getTextBounds(mDataProvider.getCoordinateLabel(i), 0, mDataProvider.getCoordinateLabel(i).length(), textbounds);
-
-            //画标识文本
-            float margin = Utils.dp2px(res, 1.5f);
+//            float txtWidth=textbounds.right-textbounds.left;
 
             canvas.save();
-//            new StaticLayout(Html.fromHtml("<font color=\"#ff0000\">P岗</font><br>（50%）"),paintLabel,100, Layout.Alignment.ALIGN_CENTER,1.0F,0.0F,true);
-            StaticLayout layout = new StaticLayout(mDataProvider.getCoordinateLabel(i),paintLabel,100, Layout.Alignment.ALIGN_CENTER,1.0F,0.0F,true);
+            paintLabel.setTextSize(mLabelTxtSize);
+            StaticLayout layout = new StaticLayout(Html.fromHtml(mDataProvider.getCoordinateLabel(i)),paintLabel, (int) Utils.dp2px(res, 70f), Layout.Alignment.ALIGN_CENTER,1.1F,0.0F,true);
             canvas.translate(isRight ? lineEndX2 + margin : lineEndX2 -layout.getWidth() - margin,lineEndY2-layout.getHeight()/2);
             layout.draw(canvas);
             canvas.restore();
 
-
-//            Paint.FontMetricsInt fmi = paintLabel.getFontMetricsInt();
-//            canvas.drawText("P岗位\n（60%）", isRight ? lineEndX2 + margin : lineEndX2 - textbounds.right - textbounds.left - margin, lineEndY2 + (fmi.bottom - textbounds.top) / 2 - fmi.bottom, paintLabel);
             //下次的起始角度
             currPer += percentage;
         }
 
         //画最外环
         paintLabel.setStyle(Paint.Style.STROKE);
-        paintLabel.setStrokeWidth(Utils.dp2px(res, 1));
+        paintLabel.setStrokeWidth(Utils.dp2px(res, 0.5f));
         paintLabel.setColor(Color.parseColor("#333333"));
         canvas.drawCircle(mCirX, mCirY, mRadius, paintLabel);
 
@@ -322,7 +332,7 @@ public class PanelRoseView extends View {
             float textWidth = textNum.right - textNum.left;
             float textBaseLineX = xcalc.getPosX() - textWidth / 2;
             float textBaseLineY = xcalc.getPosY();
-            paintValue.setColor(Utils.darkenColor(mDataProvider.getChildColor(1,mSelectedRoseIndex)));
+            paintValue.setColor(Utils.darkenColor(mDataProvider.getChildColor(mSelectedRoseIndex,0)));
             float offset = Utils.dp2px(res, 3);
             canvas.drawRect(new RectF(textBaseLineX - offset, textBaseLineY - offset / 2 + fmi.top, textBaseLineX + textWidth + offset, textBaseLineY + offset / 2 + fmi.bottom), paintValue);
             paintValue.setColor(Color.WHITE);
@@ -491,6 +501,11 @@ public class PanelRoseView extends View {
         @Override
         public int getChildColor(final int indexX,final int indexY) {
             return Color.parseColor("#999999");
+        }
+
+        @Override
+        public int getDateCount(int indexY) {
+            return 0;
         }
     }
 

@@ -3,6 +3,7 @@
  */
 package cuzki.chartgraphy;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -40,6 +41,9 @@ import lecho.lib.hellocharts.view.AbstractChartView;
 import lecho.lib.hellocharts.view.ColumnChartView;
 import lecho.lib.hellocharts.view.ComboLineColumnChartView;
 import lecho.lib.hellocharts.view.LineChartView;
+
+import static cuzki.chartgraphy.ViewPagerChartsFragment.SERVER_COMPANY_LIFE_DISTRIBUTE;
+import static cuzki.chartgraphy.ViewPagerChartsFragment.SERVER_CURRENT_PROMOTE_DISTRIBUTE;
 
 /**
  * <p/>
@@ -122,7 +126,7 @@ public class ChartFragment extends Fragment {
             case ViewPagerChartsFragment.SERVER_QUALIFICATION_DISTRIBUTE:
 
                 break;
-            case ViewPagerChartsFragment.SERVER_COMPANY_LIFE_DISTRIBUTE:
+            case SERVER_COMPANY_LIFE_DISTRIBUTE:
 
                 break;
             case ViewPagerChartsFragment.SERVER_RANK_DISTRIBUTE:
@@ -137,7 +141,7 @@ public class ChartFragment extends Fragment {
             case ViewPagerChartsFragment.SERVER_CURRENT_LEAVE_POSITION_DISTRIBUTE:
 
                 break;
-            case ViewPagerChartsFragment.SERVER_CURRENT_PROMOTE_DISTRIBUTE:
+            case SERVER_CURRENT_PROMOTE_DISTRIBUTE:
 
                 break;
 
@@ -267,12 +271,12 @@ public class ChartFragment extends Fragment {
             AxisValue a = new AxisValue(i, provider.getCoordinateLabel(i).toCharArray());
             axvalues.add(a);
         }
-        Axis axisLeftY = new Axis().setHasLines(true).setFormatter(new HeightValueFormatter(scale, sub, 0));
-        Axis axisX = new Axis().setValues(axvalues);
+        Axis axisLeftY = new Axis().setHasLines(true).setFormatter(new HeightValueFormatter(scale, sub, 0)).setTextColor(Color.parseColor("#000000"));
+        Axis axisX = new Axis().setValues(axvalues).setTextColor(Color.parseColor("#000000")).setHasTiltedLabels(true);
         data.setAxisXBottom(axisX);
         data.setAxisYLeft(axisLeftY);
 
-        Axis axisRightY = new Axis().setHasLines(true).setFormatter(new SimpleAxisValueFormatter().setAppendedText("%".toCharArray()));
+        Axis axisRightY = new Axis().setFormatter(new SimpleAxisValueFormatter().setAppendedText("%".toCharArray())).setTextColor(Color.parseColor("#000000")).setTextSize(9);
         data.setAxisYRight(axisRightY);
         return data;
     }
@@ -290,7 +294,7 @@ public class ChartFragment extends Fragment {
         line.setColor(linePrivider.getChildColor(0,0));
         line.setHasLabels(true);
         line.setHasLines(true);
-        line.setHasPoints(false).setHasLabelsOnlyForSelected(true);
+        line.setHasPoints(true).setHasLabelsOnlyForSelected(true).setShape(getShape(2));
         lines.add(line);
 
         LineChartData lineChartData = new LineChartData(lines);
@@ -321,7 +325,7 @@ public class ChartFragment extends Fragment {
         List<Line> lines = new ArrayList<Line>();
         for (int j = 0; j < providers.getChildCount(); j++) {
             List<PointValue> values = new ArrayList<PointValue>();
-            for (int i = 1; i <= providers.getDateCount(); ++i) {
+            for (int i = 1; i <= providers.getDateCount(j); ++i) {
                 values.add(new PointValue(i, providers.getValue(i - 1, j)).setLabel(providers.getValueLabel(i-1,j)));
             }
             Line line = new Line(values);
@@ -336,12 +340,12 @@ public class ChartFragment extends Fragment {
 
         List<AxisValue> axvalues = new ArrayList<AxisValue>();
         for (int i = 1; i <= providers.getDateCount(); ++i) {
-            AxisValue v = new AxisValue(i, (i + "月").toCharArray());
+            AxisValue v = new AxisValue(i, providers.getCoordinateLabel(i-1).toCharArray());
             axvalues.add(v);
         }
 
-        data.setAxisXBottom(new Axis().setValues(axvalues).setTextColor(ChartUtils.COLOR_ORANGE).setFormatter(new SimpleAxisValueFormatter().setAppendedText("月".toCharArray())).setHasTiltedLabels(true));
-        data.setAxisYLeft(new Axis().setHasLines(true));
+        data.setAxisXBottom(new Axis().setValues(axvalues).setTextColor(Color.parseColor("#000000")));
+        data.setAxisYLeft(new Axis().setHasLines(true).setTextColor(Color.parseColor("#000000")));
         data.setBaseValue(Float.NEGATIVE_INFINITY);
         return data;
 
@@ -350,13 +354,13 @@ public class ChartFragment extends Fragment {
     private ValueShape getShape(int index) {
         int i = index % 3;
         if (i == 0) {
-            return ValueShape.CIRCLE;
-        }
-        if (i == 1) {
             return ValueShape.SQUARE;
         }
-        if (i == 2) {
+        if (i == 1) {
             return ValueShape.DIAMOND;
+        }
+        if (i == 2) {
+            return ValueShape.CIRCLE;
         }
         return ValueShape.CIRCLE;
     }
@@ -413,7 +417,6 @@ public class ChartFragment extends Fragment {
         if (isVisibleToUser && mIsViewCreated && !mIsLoadDataCompleted) {
             requestDate();
         }
-
     }
 
     private void requestDate() {
@@ -435,23 +438,171 @@ public class ChartFragment extends Fragment {
             super.handleMessage(msg);
             mIsLoadDataCompleted = true;
             mData = null;
-            switch (mChartType) {//造假数据
-                case 1://线形图
-                    mData = new ChartDataProvider();
+
+            switch (mServiceType) {//造假数据
+                case ViewPagerChartsFragment.SERVER_MEMBER_DISTRIBUTE://部门人员分布
+                    MemberSpreadData memberSpreadData=new MemberSpreadData();
+                    List<ChartDataItem> chartDataItems=new ArrayList<>();
+                    chartDataItems.add(new ChartDataItem("财务部",150));
+                    chartDataItems.add(new ChartDataItem("人事部",50));
+                    chartDataItems.add(new ChartDataItem("行政部",20));
+                    chartDataItems.add(new ChartDataItem("产品部",120));
+                    chartDataItems.add(new ChartDataItem("运维部",70));
+                    chartDataItems.add(new ChartDataItem("市场部",30));
+                    chartDataItems.add(new ChartDataItem("开发部",80));
+                    chartDataItems.add(new ChartDataItem("设计部",65));
+                    memberSpreadData.chartDataItems=chartDataItems;
+                    mData = memberSpreadData;
                     break;
-                case 2://柱状图
-                    mData = (mServiceType == ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_P_DISTRIBUTE || mServiceType == ViewPagerChartsFragment.SERVER_RANK_M_DISTRIBUTE) ? new ChartDataProvider1() : new ChartDataProvider0();
+                case ViewPagerChartsFragment.SERVER_SEX_DISTRIBUTE://性别分布
+                    SexScaleData sexScaleData=new SexScaleData();
+                    List<ChartDataItem> sex=new ArrayList<>();
+                    sex.add(new ChartDataItem("女310",51));
+                    sex.add(new ChartDataItem("男310",162));
+                    sexScaleData.chartDataItems=sex;
+                    mData = sexScaleData;
                     break;
-                case 3://南丁格尔玫瑰图
-                    mData = new RoseDataProvider();
+                case  ViewPagerChartsFragment.SERVER_RANK_DISTRIBUTE://职级分布
+                    PositionSpreadData positionSpreadData=new PositionSpreadData();
+                    List<ChartDataItem> position=new ArrayList<>();
+                    position.add(new ChartDataItem("P岗",51));
+                    position.add(new ChartDataItem("M岗",162));
+                    positionSpreadData.chartDataItems=position;
+                    mData = positionSpreadData;
                     break;
-                case 4://折线柱状混合图
-                    mData = new ChartDataProvider2();
+                case  ViewPagerChartsFragment.SERVER_QUALIFICATION_DISTRIBUTE://学历分布
+                    StudyHistroyData histroyData = new StudyHistroyData();
+                    List<ChartDataItem> study=new ArrayList<>();
+                    study.add(new ChartDataItem("高中及以下",51));
+                    study.add(new ChartDataItem("大专",162));
+                    study.add(new ChartDataItem("本科",231));
+                    study.add(new ChartDataItem("研究生及以上",60));
+                    histroyData.chartDataItems=study;
+                    mData =histroyData;
                     break;
-                case 5://水平柱状图
-                    mData = new ChartDataProvider1();
+                case SERVER_COMPANY_LIFE_DISTRIBUTE://司龄分布
+                    WorkTimeData workTimeData= new WorkTimeData();
+                    List<ChartDataItem> work=new ArrayList<>();
+                    work.add(new ChartDataItem("0-1年",51));
+                    work.add(new ChartDataItem("1-3年",100));
+                    work.add(new ChartDataItem("3-5年",60));
+                    work.add(new ChartDataItem("5-10年",75));
+                    work.add(new ChartDataItem("10以上年",20));
+                    workTimeData.chartDataItems=work;
+                    mData =workTimeData;
+                    break;
+
+                case ViewPagerChartsFragment.SERVER_AGE_DISTRIBUTE://年龄分布
+                    AgeSpreadData ageSpreadData=new AgeSpreadData();
+                    List<ChartDataItem> age=new ArrayList<>();
+                    age.add(new ChartDataItem("18-30岁",51));
+                    age.add(new ChartDataItem("31-40岁",62));
+                    age.add(new ChartDataItem("41-50岁",90));
+                    age.add(new ChartDataItem("51-64岁",12));
+                    age.add(new ChartDataItem("65岁以上",72));
+                    ageSpreadData.chartDataItems=age;
+                    mData = ageSpreadData;
+                    break;
+                case ViewPagerChartsFragment.SERVER_CURRENT_LEAVE_TIME_DISTRIBUTE://近3年离职时间分析
+
+                    List<ChartDataItem> year2014s=new ArrayList<>();
+                    year2014s.add(new ChartDataItem("1月",50));
+                    year2014s.add(new ChartDataItem("2月",150));
+                    year2014s.add(new ChartDataItem("3月",250));
+                    year2014s.add(new ChartDataItem("4月",120));
+                    year2014s.add(new ChartDataItem("5月",70));
+                    year2014s.add(new ChartDataItem("6月",90));
+                    year2014s.add(new ChartDataItem("7月",100));
+                    year2014s.add(new ChartDataItem("8月",20));
+                    year2014s.add(new ChartDataItem("9月",88));
+                    year2014s.add(new ChartDataItem("10月",26));
+                    year2014s.add(new ChartDataItem("11月",60));
+                    year2014s.add(new ChartDataItem("12月",70));
+                    LeaveTimeItem year2014=new LeaveTimeItem("2014",year2014s);
+
+                    List<ChartDataItem> year2015s=new ArrayList<>();
+                    year2015s.add(new ChartDataItem("1月",150));
+                    year2015s.add(new ChartDataItem("2月",200));
+                    year2015s.add(new ChartDataItem("3月",150));
+                    year2015s.add(new ChartDataItem("4月",120));
+                    year2015s.add(new ChartDataItem("5月",160));
+                    year2015s.add(new ChartDataItem("6月",70));
+                    year2015s.add(new ChartDataItem("7月",120));
+                    year2015s.add(new ChartDataItem("8月",70));
+                    year2015s.add(new ChartDataItem("9月",40));
+                    year2015s.add(new ChartDataItem("10月",80));
+                    year2015s.add(new ChartDataItem("11月",50));
+                    year2015s.add(new ChartDataItem("12月",10));
+                    LeaveTimeItem year2015=new LeaveTimeItem("2015",year2015s);
+
+                    List<ChartDataItem> year2016s=new ArrayList<>();
+                    year2016s.add(new ChartDataItem("1月",250));
+                    year2016s.add(new ChartDataItem("2月",10));
+                    year2016s.add(new ChartDataItem("3月",150));
+                    year2016s.add(new ChartDataItem("4月",150));
+                    year2016s.add(new ChartDataItem("5月",79));
+                    year2016s.add(new ChartDataItem("6月",20));
+                    year2016s.add(new ChartDataItem("7月",10));
+                    year2016s.add(new ChartDataItem("8月",40));
+//                    year2016s.add(new ChartDataItem("9月",62));
+//                    year2016s.add(new ChartDataItem("10月",50));
+//                    year2016s.add(new ChartDataItem("11月",40));
+//                    year2016s.add(new ChartDataItem("12月",120));
+                    LeaveTimeItem year2016=new LeaveTimeItem("2016",year2016s);
+
+                    LeaveTimeData leaveTimeData=new LeaveTimeData();
+                    List<LeaveTimeItem> itms=new ArrayList<>();
+                    itms.add(year2014);
+                    itms.add(year2015);
+                    itms.add(year2016);
+                    leaveTimeData.leaveTimeItems=itms;
+                    mData=leaveTimeData;
+                    break;
+                case  ViewPagerChartsFragment.SERVER_CURRENT_LEAVE_REASON_DISTRIBUTE://近3年离职原因分析
+                    LeaveReasonData reasonData=new LeaveReasonData();
+                    List<ChartDataItem> reasonDatas=new ArrayList<>();
+                    reasonDatas.add(new ChartDataItem("个人原因",51));
+                    reasonDatas.add(new ChartDataItem("其他",62));
+                    reasonDatas.add(new ChartDataItem("不适应企业文化",90));
+                    reasonDatas.add(new ChartDataItem("缺少发展空间",12));
+                    reasonDatas.add(new ChartDataItem("薪资福利低",72));
+                    reasonData.chartDataItems=reasonDatas;
+                    mData = reasonData;
+                    break;
+                case  ViewPagerChartsFragment.SERVER_CURRENT_LEAVE_POSITION_DISTRIBUTE://近3年离职岗位分析
+                    LeavePositionData leavePositionData=new LeavePositionData();
+                    List<LeavePositionItem> leaves=new ArrayList<>();
+                    leaves.add(new LeavePositionItem("设计部",51,100,20));
+                    leaves.add(new LeavePositionItem("产品部",100,100,60));
+                    leaves.add(new LeavePositionItem("开发部",70,100,10));
+                    leaves.add(new LeavePositionItem("法政部",11,100,45));
+                    leaves.add(new LeavePositionItem("总办",21,100,51));
+                    leaves.add(new LeavePositionItem("商务部",70,100,10));
+                    leaves.add(new LeavePositionItem("公关部",11,100,45));
+                    leaves.add(new LeavePositionItem("执行部",21,100,51));
+                    leavePositionData.leavePositionItems=leaves;
+                    mData = leavePositionData;
+                    break;
+                case SERVER_CURRENT_PROMOTE_DISTRIBUTE://近3年晋升趋势分析
+                    PromoteTrendData promoteTrendData=new PromoteTrendData();
+                    List<PromoteTrendItem> promoteTrendItems=new ArrayList<>();
+                    promoteTrendItems.add(new PromoteTrendItem("2016.1",51,100,20));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.2",100,100,60));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.3",70,100,10));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.4",11,100,45));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.5",21,100,51));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.6",70,100,10));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.7",11,100,45));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.8",21,100,51));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.9",21,100,51));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.10",70,100,10));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.11",11,100,45));
+                    promoteTrendItems.add(new PromoteTrendItem("2016.12",21,100,51));
+                    promoteTrendData.promoteTrendItems=promoteTrendItems;
+                    mData = promoteTrendData;
                     break;
             }
+
             setChartData();
         }
     };
@@ -468,7 +619,10 @@ public class ChartFragment extends Fragment {
                 break;
             case 3://南丁格尔玫瑰图（兼自定义饼图）
                 PanelRoseView panelRoseView = (PanelRoseView) mChart;
-                panelRoseView.setPanelRoseData(mData);
+                if(mServiceType==ViewPagerChartsFragment.SERVER_SEX_DISTRIBUTE||mServiceType==ViewPagerChartsFragment.SERVER_RANK_DISTRIBUTE){
+                    panelRoseView.setDrawCenter(false);
+                }
+                panelRoseView.setStartDrawAngel(-90).setPanelRoseData(mData);
                 break;
             case 4://hellochart 折线柱状混合图
                 ComboLineColumnChartView comboLineColumnChartView = (ComboLineColumnChartView) mChart;
@@ -476,6 +630,10 @@ public class ChartFragment extends Fragment {
                 break;
             case 5://水平柱状图
                 HBarChartView hBarChartView = (HBarChartView) mChart;
+                if(mServiceType==ViewPagerChartsFragment.SERVER_MEMBER_DISTRIBUTE){
+                    hBarChartView.setXCoordinateDrawable(true).setYCoordinateDrawable(true).setCoordinateColor(Color.parseColor("#91c8ff"));
+                }
+                hBarChartView.setLabelTxtSize(Utils.sp2px(getResources(),15.0f));
                 hBarChartView.setBarData(mData);
                 break;
         }
@@ -517,7 +675,6 @@ public class ChartFragment extends Fragment {
     }
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
-        getView();
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) {
             Log.i("cxy", "savedInstanceState  null" + mChartType);

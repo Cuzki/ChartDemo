@@ -55,4 +55,11 @@ public interface IChartDataProvider extends Serializable {
      * @return 横坐标 color值
      */
     int getChildColor(int indexX,int indexY);
+
+    /**
+     * 获取横坐标数目
+     * @return 横坐标
+     */
+    int getDateCount(int indexY);
+
 }

@@ -171,7 +171,7 @@ public class ViewPagerChartsFragment extends Fragment {
                     type=(isMemberStatisticUse?3:3);
                     break;
                 case 2:
-                    type= (isMemberStatisticUse?2:4);
+                    type= (isMemberStatisticUse?5:4);
                     break;
                 case 3:
                     type= (isMemberStatisticUse?3:4);

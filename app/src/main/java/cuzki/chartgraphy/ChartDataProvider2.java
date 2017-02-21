@@ -62,5 +62,10 @@ public class ChartDataProvider2 implements IChartDataProvider {
         }
         return color;
     }
+
+    @Override
+    public int getDateCount(int indexY) {
+        return 0;
+    }
 }
 

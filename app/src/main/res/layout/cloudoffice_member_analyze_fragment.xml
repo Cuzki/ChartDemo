@@ -5,7 +5,7 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="26dp"
+        android:layout_height="35dp"
         android:text="@string/newest_statistic"
         android:gravity="center_vertical|left"
         android:paddingLeft="10dp"
@@ -15,15 +15,20 @@
     <lecho.lib.hellocharts.view.hack.HackyViewPager
         android:id="@+id/vp_newest_statistics"
         android:layout_width="match_parent"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         android:layout_height="0dp"
         android:layout_weight="0.9"
+        android:background="@android:color/white"
         />
     <cuzki.chartgraphy.NavigationView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/nv_newest_statistics"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="10dp"
         android:layout_gravity="center_horizontal"
         >
 
@@ -32,7 +37,7 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="26dp"
+        android:layout_height="35dp"
         android:text="@string/chart_show"
         android:paddingLeft="10dp"
         android:gravity="left|center_vertical"

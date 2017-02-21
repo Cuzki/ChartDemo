@@ -99,7 +99,6 @@ public class DataAnalyzedActivity extends FragmentActivity implements View.OnCli
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        Log.i("land","onConfigurationChanged orientation="+(newConfig.orientation == 1?"竖屏":"横屏"));
         if(newConfig.orientation == 2){//land
             int position=0;
             final String showTag = mCurrentFragmentPosition==0 ? MemberStatisticFragment.class.getSimpleName() : MemberChangeAnalyzedFragment.class.getSimpleName();

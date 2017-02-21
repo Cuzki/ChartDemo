@@ -37,6 +37,15 @@ public class HBarChartView  extends View {
     Paint paintCoor;
     Paint paintValue;
 
+    public HBarChartView setCoordinateLineWidth(float coordinateLineWidth) {
+        this.coordinateLineWidth = coordinateLineWidth;
+        init();
+        invalidate();
+        return this;
+    }
+
+    private float coordinateLineWidth=Utils.dp2px(getResources(),1.2f);
+
     /**
      * 屏幕的宽
      *
@@ -67,6 +76,7 @@ public class HBarChartView  extends View {
         paintBar.setAntiAlias(true);
         paintCoor.setAntiAlias(true);
         paintCoor.setStyle(Paint.Style.STROKE);
+        paintCoor.setStrokeWidth(coordinateLineWidth);
         paintBar.setStyle(Paint.Style.FILL_AND_STROKE);
         paintLabel.setTextSize(Utils.sp2px(getResources(), 10));
         paintValue.setTextSize(Utils.sp2px(getResources(), 10));
@@ -105,10 +115,10 @@ public class HBarChartView  extends View {
                 maxLabelWidth=labelWidth;
             }
         }
-        float labelMarginRight=Utils.dp2px(getResources(),4);//label右间距
+        float labelMarginRight=Utils.dp2px(getResources(),12);//label右间距
         maxLabelWidth+=labelMarginRight;
-        if(maxLabelWidth>width/8){//最大不超过宽度的1/8
-            maxLabelWidth=width/8;
+        if(maxLabelWidth>width/5){//最大不超过宽度的1/5
+            maxLabelWidth=width/5;
         }
         float barWidth=width-maxLabelWidth;
         if(maxValue!=0){
@@ -116,15 +126,18 @@ public class HBarChartView  extends View {
         }else {
             return;//画空
         }
-        float offset=Utils.dp2px(getResources(),4);
+        float offset=Utils.dp2px(getResources(),20);
         float barHeight=(height-offset*(count+1))/count;
+        if(barHeight>Utils.dp2px(getResources(),25f)){
+            barHeight=Utils.dp2px(getResources(),25f);
+        }
         float lineBarStartX=maxLabelWidth;
-        float lineBarStartY=offset;
+        float lineBarStartY=height/2+(barHeight*count+offset*(count+1))/2-offset;
         if(mIsDrawXCorordinate){
-            canvas.drawLine(lineBarStartX,0,lineBarStartX,height,paintCoor);
+            canvas.drawLine(lineBarStartX,height-coordinateLineWidth,lineBarStartX,0,paintCoor);
         }
         if(mIsDrawYCorordinate){
-            canvas.drawLine(lineBarStartX,height,width,height,paintCoor);
+            canvas.drawLine(lineBarStartX,height-Utils.dp2px(getResources(),1.2f),width,height,paintCoor);
         }
         Paint.FontMetricsInt LabelFmi = paintLabel.getFontMetricsInt();
         Paint.FontMetricsInt valueFmi = paintValue.getFontMetricsInt();
@@ -136,14 +149,14 @@ public class HBarChartView  extends View {
                 BarRecorder recorder=new BarRecorder();//记录该bar
                 recorder.indexY=j;
                 recorder.indexX=i;
-                float top=lineBarStartY;
-                float bottom=lineBarStartY+barHeight;
+                float top=lineBarStartY-barHeight;
+                float bottom=lineBarStartY;
                 float right=startX+diatance;
                 float left=startX;
                 paintBar.setColor(mDataProvider.getChildColor(i,j));
                 if(i==mSelectedXIndex&&j== mSelectedYIndex){
-                    top-=offset/2;
-                    bottom+=offset/2;
+                    top-=offset/4;
+                    bottom+=offset/4;
                     paintBar.setColor( Utils.darkenColor(mDataProvider.getChildColor(i,j)));
                 }
                 RectF bar=new RectF(left,top,right,bottom);
@@ -151,14 +164,17 @@ public class HBarChartView  extends View {
                 mBarRecorderList.add(recorder);
                 canvas.drawRect(bar,paintBar);
                 if(i==mSelectedXIndex&&j== mSelectedYIndex){
-                    canvas.drawText(mDataProvider.getValueLabel(i,j), right-labelMarginRight, lineBarStartY-offset/2+(offset+barHeight)/2+(valueFmi.bottom-valueFmi.top)/2-valueFmi.bottom, paintValue);
+                    canvas.drawText(mDataProvider.getValueLabel(i,j), right-labelMarginRight, lineBarStartY-barHeight/2+(valueFmi.bottom-valueFmi.top)/2-valueFmi.bottom, paintValue);
                          Log.i("tt", "--"+(right-labelMarginRight)+"--"+(lineBarStartY-offset/2+(offset+barHeight)/2+(valueFmi.bottom-valueFmi.top)/2-valueFmi.bottom));
                 }
                 startX+=+diatance;
             }
             //画label x轴
-            canvas.drawText(mDataProvider.getCoordinateLabel(i), lineBarStartX-labelMarginRight, lineBarStartY+barHeight/2+(LabelFmi.bottom-LabelFmi.top)/2-LabelFmi.bottom, paintLabel);
-            lineBarStartY=(lineBarStartY+barHeight+offset);
+            canvas.drawText(mDataProvider.getCoordinateLabel(i), lineBarStartX-labelMarginRight, lineBarStartY-barHeight/2+(LabelFmi.bottom-LabelFmi.top)/2-LabelFmi.bottom, paintLabel);
+            if(mIsDrawXCorordinate){
+                canvas.drawLine(lineBarStartX-Utils.dp2px(getResources(),7.0f),lineBarStartY-barHeight/2,lineBarStartX,lineBarStartY-barHeight/2,paintCoor);
+            }
+            lineBarStartY=(lineBarStartY-barHeight-offset);
         }
     }
 
@@ -205,6 +221,14 @@ public class HBarChartView  extends View {
         return this;
     }
 
+    public HBarChartView setCoordinateColor(int  color) {
+        if(paintCoor==null){
+            init();
+        }
+        paintCoor.setColor(color);
+        return this;
+    }
+
     public HBarChartView setLabelTxtSize(float  size) {
         if(paintLabel==null){
             init();
@@ -217,12 +241,12 @@ public class HBarChartView  extends View {
     /**
      * 水平轴及坐标线是否绘制
      */
-    private boolean mIsDrawXCorordinate=true;
+    private boolean mIsDrawXCorordinate=false;
 
     /**
      * 竖直坐标轴及坐标线是否绘制
      */
-    private boolean mIsDrawYCorordinate=true;
+    private boolean mIsDrawYCorordinate=false;
 
     private int mSelectedXIndex=-1;
     private int mSelectedYIndex=-1;
